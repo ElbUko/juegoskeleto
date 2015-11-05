@@ -23,7 +23,7 @@
         }
         ?>
     </head>
-    <body>
+    <body style="background-color: #000;">
     	<div id="nav">
             <div id="NavBtns">
                 <div class="NavBtn">
