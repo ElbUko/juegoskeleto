@@ -1,6 +1,6 @@
 <?php
-include("session.php");										# archivo con el manejo de las sesiones
-include(dirname(__DIR__)."/dao/consultas.php");				
+include_once("session.php");										# archivo con el manejo de las sesiones
+include_once(dirname(__DIR__)."/dao/consultas.php");				
 
 $usr = htmlspecialchars($_POST['usr']);						# Recojo los parametros
 $pass = htmlspecialchars($_POST['psswd']);
@@ -27,7 +27,7 @@ else {
 		}
 	}
 	else {
-		if (($pass != null)&&($pass == $registros[0]['password'])){
+		if (($pass == $registros[0]['password'])){
 			$respuesta['login'] = true;
 			$respuesta['popup'] = false;
 		}
@@ -45,13 +45,4 @@ echo json_encode($respuesta);
 
 
 
-
-
-
-/*create table puntos(
-    -> id int(11) not null auto_increment primary key,
-    -> juego varchar(20) not null,
-    -> modo varchar(20),
-    -> usuario varchar(25) not null,
-    -> puntos int(12) not null) engine= innodb;*/
 ?>

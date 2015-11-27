@@ -1,6 +1,6 @@
 <?php
-include(dirname(__DIR__)."/control/session.php");					# archivo con el manejo de las sesiones
-include(dirname(__DIR__)."/dao/consultas.php");				# Archivo con las consultas a BBDD
+include_once(dirname(__DIR__)."/control/session.php");					# archivo con el manejo de las sesiones
+include_once(dirname(__DIR__)."/dao/consultas.php");				# Archivo con las consultas a BBDD
 
 $juego = htmlspecialchars($_POST['juego']);						# Recojo los parametros
 $modo = htmlspecialchars($_POST['modo']);

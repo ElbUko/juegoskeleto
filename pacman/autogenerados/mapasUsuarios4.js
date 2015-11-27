@@ -50,4 +50,21 @@ var pantalla = [
 [ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
 [ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
 [ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x]]
+
+,[
+[ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
+[ p, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, o, x, x, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, x, o, o, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, x, x, o, o, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, x, x, x, x, x, o, o, x, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, x, x, x, x, x, x, x, o, x, x, x, x, x],
+[ x, x, x, x, 1, x, x, x, x, x, x, x, x, x, x, o, o, x, x, x],
+[ x, x, x, x, 1, 1, x, x, x, x, x, x, x, x, x, x, x, o, o, x],
+[ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
+[ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x]]
 ];

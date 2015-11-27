@@ -1,0 +1,4 @@
+
+function borraPantalla(){
+	alert('hola');
+}

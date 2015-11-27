@@ -23,6 +23,9 @@ body {
 	opacity: 0.8;
 	text-align: center;
 }
+footer {
+	width: 90%;
+}
 #NavBtns{
 	width: 300px;
 	display: inline-block;
@@ -81,8 +84,9 @@ a {
 					Portal
 ################################################## */	
 #cntPortal {
-	width:95%;
+	width:90%;
 	margin: auto;
+	text-align: center;
 }
 #tituloPortal{
 	margin-top: 5px;
@@ -95,6 +99,7 @@ a {
 #Disclaimer{
 	margin: auto;
 	font-family: Helvetica;
+	text-align: left;
 }
 #Disclaimer2{
 	font-style: italic;
@@ -104,6 +109,7 @@ a {
 	background-color: rgba(51, 140, 51, 0.79);
 	border-top-left-radius: 1em;
 	border-bottom-right-radius: 1em;
+	margin: auto;
 	margin-bottom: 5px;
 	margin-top: 5px;
 	width: 100%;
@@ -113,6 +119,7 @@ a {
 	display: inline-block;
 }
 .Disclaimer3{
+	text-align: left;
 	font-family: impact;
 	padding-left: 2em;
 	font-size: 1.5em;
@@ -340,4 +347,93 @@ index
 @media screen and (max-width: 300px){ 
 	body { background-color: red;}
 	#login {display: none;}
+}
+
+
+/*###############################################################
+###########											  ###########
+##########				MAPAS DE USUARIOS			   ##########
+###########											  ###########            
+################################################################*/
+
+#mapasUsuarios{
+	text-transform: capitalize;
+	text-decoration: underline ;
+	text-align: center;	
+	font-variant: small-caps;
+	font-size: 1.5em;
+}
+#disclaimer3 {
+	text-indent: 50px;
+	margin: 30px;
+}
+#mapasUsrBtnEditor{
+	color: black;
+	padding: 0.2em;
+	background-color: #88FF88;
+	border: 1px solid #44AA66;
+	border-radius: 5px;
+}
+
+.mapaElem {
+	display: inline-block;
+	margin-left: 50px;
+}
+.mapaNombre {
+	font-family: courier;
+	text-align: center;
+	font-family: impact;
+	font-size: 1.2em;
+}
+.mapaFoto {
+	display: block;
+	margin: auto;
+}
+#mapaEdita{
+	display: inline-block;
+}
+.mapaUsr {
+	display: inline-block;
+	text-align: right;
+	font-family: impact;
+	font-style: italic;
+	font-size: 1em;
+	vertical-align: middle;
+	margin: 0px;
+	padding-left: 5px;
+}
+.mapaForm{
+	display: inline-block;
+}
+.mapaBtnForm{
+	border:0px;
+	margin-left: 20px;
+	padding: 10px;
+	height: 30px;
+	width: 30px;
+	vertical-align: middle;
+	cursor: pointer;
+	box-sizing: content-box;
+}
+#mapaBtnEdit{
+	background:url('../img/pacman/lapiz.png') no-repeat center center; 
+	background-size: 30px 30px;
+}
+#mapaBtnBorra{
+	background:url('../img/pacman/borrar.png') no-repeat center center;
+	background-size: 30px 30px; 
+}
+#mapaEdita{
+	margin-left: 20px;
+	padding: 10px;
+	height: 30px;
+	width: 30px;
+	vertical-align: middle;
+}
+#mapaBorra{
+	margin-left: 20px;
+	padding: 10px;
+	height: 30px;
+	width: 30px;
+	vertical-align: middle;
 }

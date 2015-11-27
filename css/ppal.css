@@ -150,13 +150,7 @@ a {
 	margin-left: 0px;
 	width: 80%;
 }
-.menuOpc{
-	color: #323200;
-	padding-left: 1em;
-	background-color: #abbbab;
-	border-top-left-radius: 0.2em;
-	border-top-right-radius: 1em;
-}
+
 
 footer {
 	height: 5%;
@@ -329,4 +323,40 @@ index
 @media screen and (max-width: 300px){ 
 	body { background-color: red;}
 	#login {display: none;}
+}
+
+
+
+/*###############################################################
+###########											  ###########
+##########				MAPAS DE USUARIOS			   ##########
+###########											  ###########            
+################################################################*/
+
+.mapaElem {
+	display: inline-block;
+	margin-left: 50px;
+}
+.mapaNombre {
+	font-family: courier;
+	text-align: center;
+}
+.mapaFoto {
+	display: block;
+	margin: auto;
+}
+.mapaUsr {
+	text-align: right;
+	font-family: impact;
+	font-style: italic;
+	font-weight: 10;
+	font-size: 1.2em;
+}
+
+#mapasUsrBtnEditor{
+	color: black;
+	padding: 0.3em;
+	background-color: #88FF88;
+	border: 1px solid #44AA66;
+	border-radius: 5px;
 }

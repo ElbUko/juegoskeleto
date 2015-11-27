@@ -6,7 +6,7 @@
         <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="es-ES">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>JuegosKeleto!</title>
-        <link rel="shortcut icon" href="pacman/img/fantasma1.png" type="image/png" />
+        <link rel="shortcut icon" href="img/pacman/fantasma1.png" type="image/png" />
         <?php
         //incluyo los archivos necesarios
         include("php/control/session.php");
@@ -23,7 +23,7 @@
         }
         ?>
     </head>
-    <body style="background-color: #000;">
+    <body>
     	<div id="nav">
             <div id="NavBtns">
                 <div class="NavBtn">

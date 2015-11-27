@@ -35,10 +35,9 @@
                     timeoutId = setTimeout(arranca,1500);
                 }
                 else if (pacman.ganaste){
-				var filas = [].slice.call(document.getElementsByClassName("puntosF"));	
-				var puntosP = [].slice.call(document.getElementsByClassName("puntosP"));
-				if ((puntosP.length > 0)||(filas.length<10)){
-						console.log(puntosP[puntosP.length-1].innerHTML);
+                	var filas = [].slice.call(document.getElementsByClassName("puntosF"));	
+					var puntosP = [].slice.call(document.getElementsByClassName("puntosP"));
+					if ((puntosP.length > 1)&&(filas.length<11)){
 						if (puntosP[puntosP.length-1].innerHTML <= puntos){
 							actualizaPuntuacion();
 						}
@@ -67,9 +66,12 @@
                 return;
             }
             function arranca(){
+            	console.log(pantalla[nivel]);
                 clearTimeout(timeoutId);
                 ctx.clearRect(0,0, canvas.width, canvas.height);
-                mapa.elem = pantalla[nivel];
+                if (pantalla.length != 1){
+                	mapa.elem = pantalla[nivel];
+                }
                 ola = mapa.elem[0];
                 if ((mapa.elem.length>20)||(ola.length>40))
                     relacionAspecto=20;
@@ -132,7 +134,7 @@
             }
             
             nivel = (nivel==null)?0:nivel;
-
+/*
             function guarda(){
                 var img    = canvas.toDataURL("image/png");
                 if(window.XMLHttpRequest){
@@ -204,8 +206,22 @@ function actualizaTablero(tablaPuntos){
 		fila.className = 'puntosF';
 		tbody.appendChild(fila);
 	}
-	for (var i=0; i<tablaPuntos.length; i++){				//insercion de lo obtenido en la consulta
-		puntosU[i].innerHTML = tablaPuntos[i].usuario;
-		puntosP[i].innerHTML = tablaPuntos[i].puntos;
+	if (puntosU.length > 0){
+		for (var i=0; i<tablaPuntos.length; i++){				//insercion de lo obtenido en la consulta
+			puntosU[i].innerHTML = tablaPuntos[i].usuario;
+			puntosP[i].innerHTML = tablaPuntos[i].puntos;
+		}
 	}
+}
+
+
+function actualizaPuntuacion () {
+	ajax.open('POST', '../php/control/controlPuntos.php', true);
+	ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	console.log("llamo con puntos: "+puntos+ ", nivel: "+nivel +" y pantallaID: "+pantallaId);
+	if (pantallaId != -1)
+		var envia = 'juego=pacman&modo=usr'+pantallaId+'&puntos='+puntos;
+	else
+		var envia = 'juego=pacman&modo=std'+nivel+'&puntos='+puntos;
+	ajax.send(envia);
 }

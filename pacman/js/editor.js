@@ -5,6 +5,9 @@
 var antiguo, actual;
 var esFantasma, esPacman;
 var pacmanPuesto = false;
+var rutaImg = '../img/pacman/';
+var esEdicion = false;
+var id = null;
 
 
 /*#######################################################################################
@@ -24,7 +27,7 @@ var pacmanPuesto = false;
                     elem.id = src[k];
                     elem.width = tMenu;
                     elem.className = "elemMenu";
-                    if (src[k]=='img/par20V.png'){
+                    if (src[k]==rutaImg+'par20V.png'){
                         elem.style.border = "4px solid #66ff00";
                     }
                     fila.appendChild(elem);
@@ -151,7 +154,7 @@ var pacmanPuesto = false;
                                 cual = donde.firstChild.src;
                                 cual = 'img/' +cual.slice(cual.lastIndexOf('/')+1,cual.length);
                                 if (cual != elMenuSel){
-                                    if (cual == 'img/pacmanE1.png'){
+                                    if (cual == rutaImg+'pacmanE1.png'){
                                         liberaMenu(cual);
                                     }
                                     donde.removeChild(donde.firstChild);   
@@ -163,10 +166,10 @@ var pacmanPuesto = false;
                             clickao = event.target.id;
                         }
                         var elem = document.getElementById(elMenuSel);
-                        if (elMenuSel != 'img/borrar.png'){
+                        if (elMenuSel != rutaImg+'borrar.png'){
                             pon(clickao);
                         } 
-                        if (elMenuSel == 'img/pacmanE1.png'){
+                        if (elMenuSel == rutaImg+'pacmanE1.png'){
                             bloqueaMenu(elem);
                         }
                     }

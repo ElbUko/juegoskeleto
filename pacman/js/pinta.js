@@ -36,7 +36,7 @@
                             ctx.drawImage(bolas.img[1],i*mapa.w,j*mapa.h,mapa.w,mapa.h);   
                             bolas.pill.push([i*mapa.w,j*mapa.h]);
                         }
-                        else if ((mapa.elem[j][i]>=1)||(mapa.elem[j][i]<=15))
+                        else if ((mapa.elem[j][i]>=1)||(mapa.elem[j][i]<=15)) //En realidad solo llega a 11
                         //else                                                                //pinto las paredes.
                             ctx.drawImage(mapa.img[mapa.elem[j][i]],i*mapa.w,j*mapa.h,mapa.w,mapa.h);
                     }

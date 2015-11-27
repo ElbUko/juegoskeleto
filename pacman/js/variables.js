@@ -1,4 +1,5 @@
 //CONSTANTES:
+			var rutaImg = '../img/pacman/';
             var INTELIGEN = 2,
                 TMIEDO = 30;
             //canvas.width = 20*21;
@@ -22,7 +23,7 @@
                 y: null
             };
             var pacman = {
-                src: ['img/pacmanN1.png', 'img/pacmanN2.png'],
+                src: [rutaImg+'pacmanN1.png', rutaImg+'pacmanN2.png'],
                 img: [],
                 frame: 0,
                 face: 1,        //face es a donde mira: 0,1,2,3 (N,E,S,O)
@@ -39,7 +40,7 @@
                 v:  relacionAspecto          //vel
             };
             var fantasmas ={
-                src: ['img/fantasmaA.png','img/fantasma1.png','img/fantasma2.png','img/fantasma3.png','img/100.gif'],
+                src: [rutaImg+'fantasmaA.png',rutaImg+'fantasma1.png',rutaImg+'fantasma2.png',rutaImg+'fantasma3.png',rutaImg+'100.gif'],
                 img: [],
                 quien: [],
                 x: [],      //pos actual. Array de int
@@ -59,21 +60,23 @@
                 accion: []
             };
             var bolas = {
-                src: ['img/bola.png', 'img/bolon.png'],
+                src: [rutaImg+'bola.png', rutaImg+'bolon.png'],
                 img: [],
                 comida: [],
                 pill: []
             };
             var p='pacman',c='ciego',l='listillo',a='asesino',o='bola',O = 'bolon';
             var mapa = {
-                src: ['','img/par20V.png','img/par20H.png','img/esq20NE.png','img/esq20SE.png','img/esq20SO.png','img/esq20NO.png',
-                        'img/esqCC.png','img/esqNC.png','img/esqEC.png','img/esqSC.png','img/esqOC.png'],
+                src: ['',rutaImg+'par20V.png',rutaImg+'par20H.png',rutaImg+'esq20NE.png',rutaImg+'esq20SE.png',rutaImg+'esq20SO.png',
+                rutaImg+'esq20NO.png',rutaImg+'esqCC.png',rutaImg+'esqNC.png',rutaImg+'esqEC.png',rutaImg+'esqSC.png',rutaImg+'esqOC.png'],
                 img: [],
-                elem: pantalla[nivel],
                 w: relacionAspecto,
                 h: relacionAspecto
             };
 
+
+			
+           	var pantallaId = -1;
 
             function inicializaVariables(rel){
                 n=3;
