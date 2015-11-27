@@ -66,13 +66,17 @@
                 return;
             }
             function arranca(){
-            	console.log(pantalla[nivel]);
+            	console.log(pantalla.length);
                 clearTimeout(timeoutId);
                 ctx.clearRect(0,0, canvas.width, canvas.height);
-                if (pantalla.length != 1){
+                if (pantalla.length > 1){
                 	mapa.elem = pantalla[nivel];
+                	ola = mapa.elem[0];
                 }
-                ola = mapa.elem[0];
+                else{
+                	//es mapas de usuarios y mapa.elem carga en pacman.php
+                	ola = mapa.elem;
+                }
                 if ((mapa.elem.length>20)||(ola.length>40))
                     relacionAspecto=20;
                 else 
