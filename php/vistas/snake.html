@@ -7,15 +7,6 @@
 		<title>Snake</title>
 	</head>
 	<body onload="generaTablero()" >
-		<?php
-	        //incluyo los archivos necesarios
-	        include("../dao/consultas.php");
-	
-	        //consulto los puntos
-	        //echo("<script>var puntos = JSON.parse(".damePuntos('snake', 'std').")</scipt>");
-	        $puntos = damePuntos('snake', 'std', 10);
-			echo("<script>var tablaPuntos = ".json_encode($puntos)."; console.log(tablaPuntos)</script>\n");
-        ?>
         
 		<div id="formulario">
 			<br/>
@@ -54,7 +45,7 @@
 		<div id="pantalla">
 
 		</div>
-		<div id="puntuaciones">
+		<!--<div id="puntuaciones">
 			<br/>
 			<h3>Mejores
 			<br>
@@ -73,7 +64,7 @@
 				?>
 				</tbody>
 			</table>
-		</div>
+		</div>-->
 		<script>
 			var body, pantalla, cuerpo;
 		</script>

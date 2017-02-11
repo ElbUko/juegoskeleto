@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en" ng-app>
+<head>
+	<script type="text/javascript">
+		
+var C = {
+	nTris 			: 3,
+	tamano			: 20,
+	velJuego		: 75,
+	tics2Bajar		: 40,
+	ticsMover		: 10,
+	ticsGirar		: 10,
+	velBorrar		: 0.2,
+	cuboAncho		: 20,
+	cuboAlto		: 20,
+	minDimX			: 0,
+	minDimY			: 0,
+	maxDimX			: 10,
+	maxDimY			: 20,
+	posX 			: 5,
+	posY 		 	: 0,
+	avanzaPieza  	: 1
+};
+
+//var C = {
+//	nTris 			: 5,
+//	tamano			: 20,
+//	velJuego		: 75,
+//	tics2Bajar		: 5,
+//	ticsMover		: 2,
+//	ticsGirar		: 4,
+//	velBorrar		: 0.2,
+//	cuboAncho		: undefined,
+//	cuboAlto		: undefined,
+//	minDimX			: 0,
+//	minDimY			: 0,
+//	maxDimX			: undefined,
+//	maxDimY			: undefined,
+//	posX 			: undefined,
+//	posY 		 	: 0,
+//	avanzaPieza  	: 1
+//};
+//var arrancaC = function (){
+//	C.tics2Bajar 	= Math.floor(C.velJuego/15);
+//	C.cuboAncho		= C.tamano;
+//	C.cuboAlto		= C.tamano;
+//	C.maxDimX		= Math.floor(C.nTris*2.5);
+//	C.maxDimY		= Math.floor(C.nTris*5);
+//	C.posX 			= Math.floor(C.maxDimX/2);
+//}();
+
+
+
+/* Objeto Cubo, la pieza mas pequeÃ±a del tetris.
+ * Son las cordenadas de un div al que le da un color.
+ * Un conjunto de ellos genera una figura o el monton.
+ */
+var Cubo = function(id,cubo,posX,posY){
+	this.posX = (posX==null)? C.posX + figuras[C.nTris][id][cubo].x : posX;
+	this.posY = (posY==null)? C.posY + figuras[C.nTris][id][cubo].y : posY;
+	this.color = figuras[C.nTris][id].color;
+
+	this.sumaX = function(){
+		this.posX = this.posX+C.avanzaPieza;
+	}
+	this.restaX = function(){
+		this.posX = this.posX-C.avanzaPieza;
+	}
+	this.sumaY = function(cubo){
+		this.posY = this.posY+C.avanzaPieza;
+	}
+	this.restaY = function(){
+		this.posY = this.posY-C.avanzaPieza;
+	}
+};
+
+
+/* Objeto Figura, lo que se mueve en el juego.
+ * Se compone de un conjunto de Cubos, 
+ * id: es la figura en cuestion. Se usa para dibujarla,
+ * ticsPaBajar: los ciclos de juego restantes para que baje otro paso,
+ * tocaSuelo: Si esta en activo y vuelve a darse, la figura pasa al monton.
+ */
+var Figura = function(id){
+
+	this.id = (id || Math.round(Math.random()*figuras[C.nTris].tiles));
+	
+	for (var i=0; i<C.nTris; i++){
+		this['cubo'+i] = new Cubo(this.id, i);
+	}
+
+	this.tocoAbajo = false;
+	this.tics2Bajar = (J)?J.pantalla.tics2Bajar:C.tics2Bajar;
+	this.ticsMover = C.ticsMover;
+	this.ticsGirar = 0;
+
+	var fig = this;
+
+	var cargaFigura = function() {
+		for (var cubo=0;cubo<C.nTris; cubo++){
+			fig['cubo'+cubo] 
+				= new Cubo(fig.id,cubo);
+		}
+	}();
+
+	this.sumaY = function(){
+		for (var cubo=0;cubo<C.nTris; cubo++){
+			this['cubo'+cubo].sumaY();
+		}
+	};
+	this.sumaX = function(){
+		for (var cubo=0;cubo<C.nTris; cubo++){
+			this['cubo'+cubo].sumaX();
+		}
+	};
+	this.restaX = function(){
+		for (var cubo=0;cubo<C.nTris; cubo++){
+			this['cubo'+cubo].restaX();
+		}
+	};
+	this.restaY = function(){
+		for (var cubo=0;cubo<C.nTris; cubo++){
+			this['cubo'+cubo].restaY();
+		}
+	};
+};
+
+
+/* Objeto que almacena los cubos del monton
+ * Se le iran aÃ±adiendo atributos Cubo dinamicamente
+ */
+var Monton = function(){
+	this.cubos = 0;
+	this.filas = [];
+};
+
+
+/* Objeto Pantalla, almacena aspectos generales
+ * dimension en X e Y de 0 a Max,
+ * monton: un objeto que 
+ */
+var Pantalla = function(){
+	this.minDimX = C.minDimX;
+	this.minDimY = C.minDimY;
+	this.maxDimX = C.maxDimX;
+	this.maxDimY = C.maxDimY;
+	this.monton = new Monton();
+	this.tics2Bajar = C.tics2Bajar;
+	this.nFilas = 0;
+	this.fila = false;
+};
+
+
+var figuras = {	
+	'3' : {
+		'tiles' : 3,
+		'0' : {
+			'color' : '#169',
+		 	'0': {x: -1, y: 0}, '1':{x: 1, y: 2}, '2':{x: 0, y: 0}
+		},
+		'1' : {
+			'color' : '#fac',
+		 	'0': {x: -1, y: 0}, '1':{x: 2, y: 1}, '2':{x: 0, y: 0}
+		},
+		'2' : {
+			'color' : '#3c3',
+		 	'0': {x: -1, y: 0}, '1':{x: 1, y: -2}, '2':{x: 0, y: 0}
+		},
+		'3' : {
+			'color' : '#c3c',
+		 	'0': {x: -1, y: 0}, '1':{x: 2, y: -1}, '2':{x: 0, y: 0}
+		}
+	},
+	'3c' : {
+		'tiles' : 1,
+		'0' : {
+			'color' : '#169',
+		 	'0': {x: -1, y: 0}, '1':{x: 1, y: 0}, '2':{x: 0, y: 0}
+		},
+		'1' : {
+			'color' : '#fac',
+		 	'0': {x: -1, y: 0}, '1':{x: 0, y: 1}, '2':{x: 0, y: 0}
+		}
+	},
+	'4' : {
+		'tiles' : 6,
+		// Figuras
+		'0' : {				
+			'color' : '#C33',
+		 	'0': {x:  0, y: -1}, '1':{x:  1, y: -1}, '2':{x:  0, y:  0}, '3':{x:  1, y:  0}
+		},
+		'1' : {
+			'color' : '#3C3',
+			'0': {x: -2, y:  0}, '1':{x: -1, y:  0}, '2':{x:  0, y:  0}, '3':{x:  1, y:  0}
+		},
+		'2' : {
+			'color' : '#33C',
+			'0': {x: -1, y: -1}, '1':{x:  0, y: -1}, '2':{x:  0, y:  0}, '3':{x:  1, y:  0}
+		},
+		'3' : {
+			'color' : '#CC3',
+			'0': {x: -1, y:  0}, '1':{x:  0, y: -1}, '2':{x:  0, y:  0}, '3':{x:  1, y: -1}
+		},
+		'4' : {
+			'color' : '#C3C',
+			'0': {x: -1, y:  0}, '1':{x:  0, y: -1}, '2':{x:  0, y:  0}, '3':{x:  1, y:  0}
+		},
+		'5' : {
+			'color' : '#3CC',
+			'0': {x: -1, y: -1}, '1':{x: -1, y:  0}, '2':{x:  0, y:  0}, '3':{x:  1, y:  0}
+		},
+		'6' : {
+			'color' : '#294675',
+			'0': {x: -1, y:  0}, '1':{x:  1, y: -1}, '2':{x:  0, y:  0}, '3':{x:  1, y:  0}
+		}
+	},
+	'5' : {
+		'tiles' : 17,
+		// Figuras
+		'0' : {
+			'color' : '#169',
+		 	'0':{x: -2, y: 0}, '1':{x: -1, y: 0},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 2, y: 0}
+		},
+		'1' : {
+			'color' : '#BFA',
+		 	'0':{x: -2, y: 0}, '1':{x: -1, y: 0},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 1, y: 1}
+		},
+		'2' : {
+			'color' : '#3FA',
+		 	'0':{x: -2, y: 0}, '1':{x: -1, y: 0},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 0, y: 1}
+		},
+		'3' : {
+			'color' : '#39A',
+		 	'0':{x: -1, y: 0}, '1':{x: 0, y: 1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 2, y: 0}
+		},
+		'4' : {
+			'color' : '#C9A',
+		 	'0':{x: -1, y: 0}, '1':{x: -1, y: -1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 2, y: 0}
+		},
+		'5' : {
+			'color' : '#C93',
+		 	'0':{x: -2, y: 0}, '1':{x: -1, y: 0},'2':{x: 0, y: 0},'3':{x: 0, y: -1},'4':{x: 0, y: -2}
+		},
+		'6' : {
+			'color' : '#CE3',
+		 	'0':{x: -1, y: 1}, '1':{x: 0, y: 1},'2':{x: 0, y: 0},'3':{x: 0, y: -1},'4':{x: 1, y: 1}
+		},
+		'7' : {
+			'color' : '#C93',
+		 	'0':{x: -1, y: 0}, '1':{x: 0, y: -1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 1, y: -1}
+		},
+		'8' : {
+			'color' : '#C9E',
+		 	'0':{x: -1, y: 0}, '1':{x: -1, y: -1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 1, y: -1}
+		},
+		'9' : {
+			'color' : '#F33',
+		 	'0':{x: -1, y: 0}, '1':{x: -1, y: -1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 0, y: -1}
+		},
+		'10' : {
+			'color' : '#3F3',
+		 	'0':{x: -2, y: 0}, '1':{x: -1, y: 0},'2':{x: 0, y: 0},'3':{x: 0, y: -1},'4':{x: 1, y: -1}
+		},
+		'11' : {
+			'color' : '#33F',
+		 	'0':{x: -1, y: -1}, '1':{x: 0, y: -1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 2, y: 0}
+		},
+		'12' : {
+			'color' : '#3FF',
+		 	'0':{x: -1, y: 0}, '1':{x: 0, y: -1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 1, y: -1}
+		},
+		'13' : {
+			'color' : '#F3F',
+		 	'0':{x: -1, y: 0}, '1':{x: -1, y: 1},'2':{x: 0, y: 0},'3':{x: 1, y: 0},'4':{x: 1, y: -1}
+		},
+		'14' : {
+			'color' : '#33F',
+		 	'0':{x: -1, y: 0}, '1':{x: 1, y: 1},'2':{x: 0, y: 0},'3':{x: 0, y: -1},'4':{x: 1, y: 0}
+		},
+		'15' : {
+			'color' : '#000',
+		 	'0':{x: -1, y: 0}, '1':{x: 0, y: 1},'2':{x: 0, y: 0},'3':{x: 0, y: -1},'4':{x: 1, y: 0}
+		},
+		'16' : {
+			'color' : '#CCC',
+		 	'0':{x: -1, y: 0}, '1':{x: -1, y: 1},'2':{x: 0, y: 0},'3':{x: 0, y: -1},'4':{x: 1, y: 0}
+		},
+		'17' : {
+			'color' : '#555',
+		 	'0':{x: -1, y: 0}, '1':{x: -1, y: -1},'2':{x: 0, y: 0},'3':{x: 1, y: 1},'4':{x: 1, y: 0}
+		}
+	}
+};
+
+
+
+/*
+Rotacion: 		x'				y'
+0: 0Âº		 
+1: 90Âº
+2: 180Âº
+3: 270Âº
+
+siempre es -90Âº!!
+	x' = cos(-90) x - sen(-90) y = cos90 x + sen90 y 	=  0 x + 1 y 	=  y
+	y' = sen(-90) x + cos(-90) y = -sen90 x + cos90 y 	= -1 x + 0 y 	= -x
+	-1, 1	0, 1	1, 1
+	-1, 0	0, 0	0, 1
+	-1,-1	0,-1	1,-1					x' = y
+											y' = -x
+
+Dim 	y 	x
+	3: 	15	7
+	4: 	20	10
+	5: 	25 	12
+
+
+
+
+	Leyenda Figuras:
+
+3			 0
+	0@0		0@
+
+
+4
+	00				00		 00		 0		0		  0
+	@0		00@0	 @0		0@ 		0@0		0@0 	0@0
+
+5
+				   0		  0			 0 			0
+	00@00		00@0		00@0		0@00 		0@00
+
+	  0			 0	
+	  0			 @ 			 00			0 0			00		  00 	00
+	00@			000 		0@0			0@0			0@0		00@		 @00
+				
+	  0			  0			 0 			 0 			 0 		0
+	0@0			0@0			0@0 		0@0			0@0		0@0
+	 0			0			  0 		 0			0		  0
+
+
+6 
+				    0		   0	  0		 0 			0
+	00@000		000@0		000@0	00@00	0@000 		0@000
+
+	00			00			0 0	  	0  0	 0 0 	  00	   00
+	 00@0		000@		00@0	00@0	0@00	0@00	00@0
+
+	0   	 0 		  0
+	0		 0		  0
+	000@	0000	0000 	...
+
+
+*/
+var ControlTeclado = function(){
+	var teclaDcha = false;
+	var teclaIzq = false;
+	var teclaArriba = false;
+	var teclaAbajo = false;
+	var barra = false;
+	var teclaP = false;
+
+	this.aprietaTecla = function (evt) {
+		if (evt.keyCode == 39) {
+			teclaDcha = true;
+			teclaIzq = false;
+		}
+		else if (evt.keyCode == 37) {
+			teclaIzq = true;
+			teclaDcha = false;
+		}
+		if (evt.keyCode == 38) {
+			teclaArriba = true;
+		}
+		if (evt.keyCode == 40) {
+			teclaAbajo = true;
+		}
+		if (evt.keyCode == 32) {
+			barra = true;
+		}
+		if (evt.keyCode == 80 && !J.pausa) {
+			teclaP = true;
+		}
+		else if (evt.keyCode == 80 && J.pausa){
+			teclaP = false;
+			J.mueve();
+		}
+		
+		return;
+	//38 arriba //40 abajo //32 barra
+	};
+	document.addEventListener("keydown",this.aprietaTecla,false);
+
+
+
+	this.sueltaTecla = function (evt) {
+		if (evt.keyCode == 39) {
+			teclaDcha = false;
+		}
+		else if (evt.keyCode == 37) {
+			teclaIzq = false;
+		}
+		if (evt.keyCode == 38) {
+			teclaArriba = false;
+		}
+		if (evt.keyCode == 40) {
+			teclaAbajo = false;
+		}
+		return;
+	};
+	document.addEventListener("keyup",this.sueltaTecla,false);
+
+	this.desactivaBarra = function() {
+		barra = false;		
+		return;
+	}
+
+
+
+	this.__defineGetter__("teclaDcha", function(){
+		return teclaDcha;}
+		);
+	this.__defineSetter__("teclaDcha", function(valor){});
+
+	this.__defineGetter__("teclaIzq", function(){
+		return teclaIzq;
+	});
+	this.__defineSetter__("teclaIzq", function(valor){});
+
+	this.__defineGetter__("teclaArriba", function(){
+		return teclaArriba;
+	});
+	this.__defineSetter__("teclaArriba", function(valor){});
+
+	this.__defineGetter__("teclaAbajo", function(){
+		return teclaAbajo;
+	});
+	this.__defineSetter__("teclaAbajo", function(valor){});
+
+	this.__defineGetter__("barra", function(){
+		return barra;
+	});
+	this.__defineSetter__("barra", function(valor){});
+
+	this.__defineGetter__("teclaP", function(){
+		return teclaP;
+	});
+	this.__defineSetter__("teclaP", function(valor){});
+}
+
+var Motor = function(){
+	this.rotaFigura = function(){
+		var cubo0 = new Cubo(J.figuraRe.id, 2);
+		var cubos = [];
+		var choca = false;
+		var mueveX;
+		//Almacenamos en cubos el cubo rotado
+		for (var i=0; i<C.nTris; i++){
+			var cubo = new Cubo(J.figuraRe.id, i);
+			cubo.posX = -J.figuraRe['cubo'+i].posY + J.figuraRe.cubo2.posY + J.figuraRe.cubo2.posX;
+			cubo.posY = J.figuraRe['cubo'+i].posX - J.figuraRe.cubo2.posX + J.figuraRe.cubo2.posY;
+			cubo.color = J.figuraRe['cubo'+i].color;
+			cubos.push(cubo);
+		}
+		//Desplazamos la figura mientras este fuera de pantalla
+		do {
+			//vemos si se sale
+			mueveX = 0;
+			for (var i=0; i<C.nTris; i++){
+				if (mueveX == 0){
+					if (cubo.posX < C.minDimX) {mueveX = 1;}
+					if (cubo.posX >= C.maxDimX) {mueveX = -1;}
+				}
+			}
+			//movemos
+			for (var i=0; i<C.nTris; i++){
+				if (mueveX < 0) {
+					cubos[i].restaX();
+				}
+				if (mueveX > 0) {
+					cubos[i].sumaX();
+				}
+			}
+		}
+		while (mueveX != 0)
+		//Chequeamos que no este dando en el monton
+		for (var i=0; i<C.nTris; i++) {
+			if (!choca){
+				choca = J.motor.collider(cubos[i]);
+			}
+		}
+		//Si va bien asigno
+		if (!choca){
+			for (var i=0; i<C.nTris; i++) {
+				var cubo = cubos.shift();
+				J.figuraRe['cubo'+i].posX = cubo.posX;
+				J.figuraRe['cubo'+i].posY = cubo.posY; 
+			}
+		}
+		return;
+	};
+
+
+	this.mueveAbajo = function(){
+		var toca = false;
+		var cubo;
+		for (var i=0; i<C.nTris; i++){
+			cubo = new Cubo(J.figuraRe.id,i,J.figuraRe['cubo'+i].posX,J.figuraRe['cubo'+i].posY+C.avanzaPieza);
+			if (cubo && !toca) {
+				toca = J.motor.collider(cubo);
+			}
+		}
+		if (toca){
+			J.pantalla.aMonton();
+			J.ctlTec.desactivaBarra();
+			J.figuraRe = new Figura();
+		}
+		else {			
+			J.figuraRe.sumaY();
+			J.figuraRe.tics2Bajar = J.pantalla.tics2Bajar;
+		}
+	};
+
+
+	this.mueveAlLado = function(){
+		var choca = false;
+		var cubo = null;
+		for (var i=0; i<C.nTris; i++){
+			if (J.ctlTec.teclaIzq){
+				cubo = new Cubo(J.figuraRe.id,i,J.figuraRe['cubo'+i].posX-C.avanzaPieza,J.figuraRe['cubo'+i].posY);
+			}
+			if (J.ctlTec.teclaDcha){
+				cubo = new Cubo(J.figuraRe.id,i,J.figuraRe['cubo'+i].posX+C.avanzaPieza,J.figuraRe['cubo'+i].posY);
+			}
+			if (cubo && !choca){
+				choca = J.motor.collider(cubo);
+			}
+		}
+		if (!choca){
+			if (J.ctlTec.teclaIzq) { J.figuraRe.restaX();}
+			if (J.ctlTec.teclaDcha) { J.figuraRe.sumaX();}			
+		}
+	};
+
+	this.collider = function(cubo){
+		var choca = false;
+		if (cubo.posX < J.pantalla.minDimX || cubo.posX >= J.pantalla.maxDimX
+			|| cubo.posY > J.pantalla.maxDimY){
+			choca = true;
+		}
+		else {
+			for (var j=0; j<J.pantalla.monton.cubos; j++){
+				if ((cubo.posY == J.pantalla.monton['cubo'+j].posY)
+				  &&(cubo.posX == J.pantalla.monton['cubo'+j].posX)){
+					choca = true;
+				}
+			}
+		}
+		return choca;
+	};
+
+	// Metodo que controla el movimiento de la ficha
+	this.mueve = function(){
+		J.ctlTec.teclaAbajo = true;
+		if (J.figuraRe.ticsMover == 0 
+			&& (J.ctlTec.teclaIzq || J.ctlTec.teclaDcha)){
+			this.mueveAlLado();
+			J.figuraRe.ticsMover = C.ticsMover;
+		}
+		if (J.figuraRe.ticsMover != 0){
+			J.figuraRe.ticsMover -=1;
+		}
+
+		if (J.figuraRe.ticsGirar == 0
+		 && J.ctlTec.teclaArriba){
+			this.rotaFigura();
+			J.figuraRe.ticsGirar = C.ticsGirar;
+		}
+		if (J.figuraRe.ticsGirar != 0) {
+			J.figuraRe.ticsGirar -= 1;
+		}
+
+		if (J.figuraRe.tics2Bajar == 0 
+		 || (J.figuraRe.ticsMover == 0 && J.ctlTec.teclaAbajo)){
+			this.mueveAbajo();
+			if (J.ctlTec.teclaAbajo){
+				J.figuraRe.ticsMover = C.ticsMover;		
+			}
+		}
+		else {
+			J.figuraRe.tics2Bajar -= 1;
+		}
+		if (J.ctlTec.barra) {
+			this.mueveAbajo();
+		}
+	};
+};
+
+
+/* Pinta es el metodo encargado de colorear los divs
+ * si recibe algo como parametro borra en lugar de pintar
+ */
+var pinta = function(borra) {
+	this.pintaFigura = function(borra){
+		var blanco = borra ? '#fff' : null;
+		for (var i=0; i<C.nTris; i++){
+			if (!J.figuraRe.seDio && (J.figuraRe['cubo'+i].posY >= C.minDimY && J.figuraRe['cubo'+i].posY <= C.maxDimY
+			&& J.figuraRe['cubo'+i].posX >= C.minDimX && J.figuraRe['cubo'+i].posX <= C.maxDimX)){
+				var cuad = document.getElementById(J.figuraRe['cubo'+i].posY+','+J.figuraRe['cubo'+i].posX);
+				cuad.style.backgroundColor = (blanco || J.figuraRe['cubo'+i].color);
+			}
+		}
+		return;
+	};
+	this.pintaMonton = function(){
+		for (var i=0; i<J.pantalla.monton.cubos; i++){
+			var cuads = document.getElementById(J.pantalla.monton['cubo'+i].posY+','+J.pantalla.monton['cubo'+i].posX);
+			cuads.style.backgroundColor = J.pantalla.monton['cubo'+i].color;
+		}
+		return;
+	};
+	this.borraPantalla = function(){
+		for (var i=0; i<=C.maxDimY; i++){
+			for (var j=0; j<C.maxDimX; j++){
+				var cuads = document.getElementById(i+','+j);
+				cuads.style.backgroundColor = '#fff';
+				cuads.style.opacity = 1;
+			}
+		}
+	}
+};
+
+
+/* aMonton es el metodo de Pantalla encargado de aÃ±adir
+ * la ficha en juego al monton
+ */
+Pantalla.prototype.aMonton = function(){
+	for (var i=0; i<C.nTris; i++){
+		var cubo = new Cubo(J.figuraRe.id,i,J.figuraRe['cubo'+i].posX,J.figuraRe['cubo'+i].posY);
+		if (cubo.posY < 0){
+			J.pinta.borraPantalla();
+			J = null;
+			J = new Juego();
+		}
+		else {
+			J.pantalla.monton['cubo'+J.pantalla.monton.cubos] = cubo;
+			J.pantalla.monton.cubos += 1;
+		}
+	}
+	J.pantalla.compruebaFilas();
+	J.pinta.pintaMonton();
+	return;
+};
+
+Pantalla.prototype.quitaFilas = function(){
+	var op = document.getElementById(J.pantalla.monton.filas[0]+','+0).style.opacity;
+	op = (op=='' || op==1)?0.9:op-0.1;
+	if (op < 0){
+		//Quito cubos
+		var cubos0 = J.pantalla.monton.cubos;
+		var cubos1 = 0; //cubos0 - J.pantalla.monton.filas*C.maxDimX;
+		for (var i=0; i<cubos0; i++){
+			var h = J.pantalla.monton['cubo'+i].posY;
+			var fila=false, sup=0;
+			for (var j=0; j<J.pantalla.monton.filas.length; j++){
+				if (h == J.pantalla.monton.filas[j]) {
+					fila=true;
+				}
+				if (h < J.pantalla.monton.filas[j]) {
+					sup+=1;
+				}
+			}
+			if (!fila){
+				J.pantalla.monton['cubo'+cubos1].posX = J.pantalla.monton['cubo'+i].posX
+				J.pantalla.monton['cubo'+cubos1].posY = J.pantalla.monton['cubo'+i].posY
+				while (sup){
+					//Lo bajo
+					J.pantalla.monton['cubo'+cubos1].sumaY();
+					sup -=1;
+				}
+				J.pantalla.monton['cubo'+cubos1].color = J.pantalla.monton['cubo'+i].color;
+				cubos1 += 1;
+			}
+		}
+		J.pantalla.monton.cubos = cubos1;
+		J.pantalla.nFilas += J.pantalla.monton.filas.length;
+		console.log(J.pantalla.nFilas);
+		if (J.pantalla.tics2Bajar>0){
+			J.pantalla.tics2Bajar = C.tics2Bajar - Math.floor(J.pantalla.nFilas/10)*5;
+			console.log(J.pantalla.tics2Bajar)
+		}
+		J.pantalla.monton.filas = [];
+		J.pantalla.filas = false;
+		J.pinta.borraPantalla();
+		J.pinta.pintaMonton();
+	}
+	else{
+		//bajo opacidad
+		for (var i=0; i<J.pantalla.monton.filas.length; i++){
+			for ( j = 0; j < C.maxDimX; j++) {
+				var cuad = document.getElementById(J.pantalla.monton.filas[i]+','+j);
+				cuad.style.opacity = op;
+			}
+		}
+		requestAnimationFrame(J.pantalla.quitaFilas);
+		//setTimeout(J.pantalla.quitaFilas,Math.floor(C.velJuego/2));
+	}
+}
+
+Pantalla.prototype.compruebaFilas = function(){
+	var chk;
+	var chkFilas =  new Array(C.maxDimY);
+	for (var i=0; i<J.pantalla.monton.cubos; i++) {
+		if (chkFilas[J.pantalla.monton['cubo'+i].posY] == undefined){
+			chkFilas[J.pantalla.monton['cubo'+i].posY] = new Array(C.maxDimX);
+		}
+		chkFilas[J.pantalla.monton['cubo'+i].posY][J.pantalla.monton['cubo'+i].posX] = true;
+	}
+	for (var i=0; i<chkFilas.length; i++) {
+		chk = false;
+		if (chkFilas[i] != undefined){
+			chk = true;
+			for (var j=0; j<chkFilas[i].length; j++) {
+				if (chk) {
+					chk = chkFilas[i][j];
+				}
+			}
+		}
+		if (chk){
+			J.pantalla.monton.filas.push(i);
+			J.pantalla.filas = true;
+		}
+	}
+	if (J.pantalla.filas){
+		requestAnimationFrame(J.pantalla.quitaFilas);
+		//setTimeout(J.pantalla.quitaFilas,Math.floor(C.velJuego/2));
+	}
+};
+
+// Metodo iterativo que genera los divs rejilla del juego
+var generaRejilla = function(){
+	caja = document.createElement("div");
+	caja.id = 'caja';
+	caja.style.width = C.maxDimX * C.cuboAncho + C.cuboAncho + 'px';
+	caja.style.height = C.maxDimY * C.cuboAlto + C.cuboAlto + 'px';
+	pantalla.appendChild(caja);
+	for ( i = 0; i <= C.maxDimY; i++) {
+		var fila = document.createElement("div");
+		fila.id = "fila";
+		fila.style.height = C.tamano+'px';
+		caja.appendChild(fila);
+		for ( j = 0; j < C.maxDimX; j++) {
+			var casilla = document.createElement("div");
+			var id = i + ',' + j;
+			casilla.id = id;
+			casilla.style.height = C.tamano+'px';
+			casilla.style.width = C.tamano+'px';
+			casilla.className = "casilla";
+			fila.appendChild(casilla);
+		}
+	}
+};
+
+
+var ControlJuego = function(){
+	this.juega = function(){
+		J.pausa = J.ctlTec.teclaP;
+		if (!J.pausa) {
+			J.pinta.pintaFigura('borra');
+			J.motor.mueve();
+			J.pinta.pintaFigura();
+			//console.log(J.figura.posX + ' ' +J.figura.posY);
+			J.mueve();
+		}
+	};
+};
+
+
+
+var Juego = function(){
+	//Atributos
+	this.pausa = false;
+	this.pantalla = new Pantalla();
+	this.figuraRe = new Figura();
+	this.figuraBorra = new Figura(this.figuraRe.id);
+
+
+	//Metodos
+	this.ctlTec = new ControlTeclado();
+	this.ctlJ = new ControlJuego();
+	this.motor = new Motor();
+	this.pinta = new pinta();
+	this.mueve = function(){
+		requestAnimationFrame(J.ctlJ.juega);
+		//setTimeout(J.ctlJ.juega,C.velJuego);
+	};
+};
+
+	</script>
+	<meta charset="utf-8"></meta>
+	<title>Tetris!</title>
+	<link type="text/css" rel="stylesheet" href="tetris.css">
+	<style>
+		#caja {
+			border: 1px solid black;
+			display: block;
+			vertical-align: middle;
+			margin: auto;
+			/**/
+		}
+		#fila {
+			display: block;
+			padding: 0px;
+			/*border: 1px solid red;*/
+		}
+
+		.casilla {
+			display: inline-block;
+			vertical-align: top;
+			border: 1px solid white;
+		}
+	</style>
+</head>
+<body onload="J.mueve();" >
+
+	<br/><br/>
+	<div id="contenedor">
+		<div id="menu">
+			<form action="tetris.html">
+				<select name="select" id="select">
+				  <option value="3">Tris</option> 
+				  <option value="4" selected>Tetris</option>
+				  <option value="5">Pentris</option>
+				</select>
+				<input type="submit" value="Empezar"></submit>
+			</form>
+		</div> 
+		<div id="pantalla">
+		</div>
+	</div>
+
+	<script type="text/javascript">
+
+		function parseSecond(val) {
+		    var result,
+		        tmp = [];
+		    var items = location.search.substr(1).split("&");
+		    for (var index = 0; index < items.length; index++) {
+		        tmp = items[index].split("=");
+		        if (tmp[0] === val) result = decodeURIComponent(tmp[1]);
+		    }
+		    return result;
+		}
+
+		generaRejilla();
+		var nTris = parseSecond('select');
+		C.nTris = (nTris != undefined)?nTris:4;
+		document.getElementById('select').value = C.nTris;
+		var J = new Juego();	
+	</script>
+</body>
+</html>

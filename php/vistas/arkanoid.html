@@ -6,17 +6,7 @@
         <meta http-equiv="content-language" content="es-ES">
         <title>Arkanoid</title>
 	</head>
-	<body onload="control()">
-		<?php
-	        //incluyo los archivos necesarios
-	        include("../dao/consultas.php");
-	
-	        //consulto los puntos
-	        //echo("<script>var puntos = JSON.parse(".damePuntos('snake', 'std').")</scipt>");
-	        $puntos = damePuntos('arkanoid', 'std', 10);
-			echo("<script>var tablaPuntos = ".json_encode($puntos)."; console.log(tablaPuntos)</script>\n");
-        ?>
-        
+	<body onload="control()">        
 		<div id="formulario">
 			<br/>
 			<h3>Opciones</h3>
@@ -44,11 +34,11 @@
 		</div>	
 		<div id="juego">
 			<canvas id="canvas" style="display:block;margin-top:100px;margin:auto;border:1px solid blue;">
-				<p>Oh...! tu navegador no te deja jugar a esto! (Actualiza leche!)</p>
+				<p>Oh...! tu navegador no te deja jugar a esto! </p>
 			</canvas>
 			<p style="text-align: center;font-family: courier;">Flechas para mover, Espacio para jugar, P para pausar.</p>
 		</div>
-		<div id="puntuaciones">
+		<!--<div id="puntuaciones">
 			<br/>
 			<h3>Mejores
 			<br>
@@ -66,7 +56,7 @@
 				}
 				echo("</tbody></table>");
 			?>
-		</div>
+		</div>-->
 		<script type="text/javascript" src="../../js/arkanoid.js"></script>
 	</body>
 </html>
