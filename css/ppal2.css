@@ -416,11 +416,11 @@ index
 	box-sizing: content-box;
 }
 #mapaBtnEdit{
-	background:url('../img/pacman/lapiz.png') no-repeat center center; 
+	background:url('/juegos/pacman/img/lapiz.png') no-repeat center center; 
 	background-size: 30px 30px;
 }
 #mapaBtnBorra{
-	background:url('../img/pacman/borrar.png') no-repeat center center;
+	background:url('/juegos/pacman/img/borrar.png') no-repeat center center;
 	background-size: 30px 30px; 
 }
 #mapaEdita{

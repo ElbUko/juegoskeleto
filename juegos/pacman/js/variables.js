@@ -1,5 +1,5 @@
 //CONSTANTES:
-			var rutaImg = '../img/pacman/';
+			var rutaImg = 'img/';
             var INTELIGEN = 2,
                 TMIEDO = 30;
             //canvas.width = 20*21;

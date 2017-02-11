@@ -3,7 +3,7 @@
             document.addEventListener('mouseout',rSale);
             document.addEventListener('mousedown',rPincha);
             document.addEventListener('mouseup',rSuelta);
-            var rutaImg = '../img/pacman/';
+            var rutaImg = 'img/';
             var menu = document.getElementById("menu");
             var mapa = document.getElementById("mapa");
             var cajatxtnombre = document.getElementById("nombre");

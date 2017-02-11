@@ -5,7 +5,7 @@
 var antiguo, actual;
 var esFantasma, esPacman;
 var pacmanPuesto = false;
-var rutaImg = '../img/pacman/';
+var rutaImg = 'img/';
 var esEdicion = false;
 var id = null;
 
