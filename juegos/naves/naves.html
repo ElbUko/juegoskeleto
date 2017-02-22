@@ -1,0 +1,455 @@
+<html>
+	<head>
+		<title>Vuela!</title>
+		<meta charset="utf-8"/>
+		<style>
+		body,html{
+			padding: 0px;
+			margin: 0px;
+		}
+		canvas { 
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AYUESghhnvz+QAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACOSURBVGje7dbRCcAgDEXRZ4fo/ht0CEGcpdARit2gYNUmyg3kT4SDPk2QVLRAbVqkgAABAgQIECDeITnFqvWltXOKpcc+LR0YGt/rlHT8CRl1IrekS9I+O4RXCwgQIEDmgtTOV/wjQIAYQr4GlqGRqwXEAcQiwIQdCJB++SQjQIAAAQLEHOJhoORDBDKoHqkyTu9Z3PQpAAAAAElFTkSuQmCC);
+		}
+		</style>
+	</head>
+	<body >
+		<canvas id="canvas" ></canvas>
+		<script type="text/javascript" src="controlTeclado.js"></script>
+		<script>
+
+canvas = document.getElementById('canvas');
+	ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+	ctx.fillStyle = "black";
+	ctx.font = canvas.width*108/1000+"px serif";
+	ctx.fillText("CARGANDO...", canvas.width*100/1000, canvas.height*200/500);
+    
+   var frameRate = 50;
+var frame = 0;
+
+var ctl = new ControlTeclado();
+centroX = Math.round(canvas.width/2);
+centroY = Math.round(canvas.height/2);
+
+//var fotos = ['img/nave2.png'];
+
+var direcciones=[];
+var direccion=0;
+
+
+			//###########################################################
+			//#####				Mover al muñeco						#####
+			//###########################################################
+			//
+		
+
+function pintaMapa(){
+	ctx.clearRect(0,0, canvas.width, canvas.height);
+	for (var dx=p.ptoRef.X; dx<canvas.width+p.ptoRef.X+50; dx+=50){
+		for (var dy=p.ptoRef.Y-50; dy<canvas.height+p.ptoRef.Y; dy+=50){
+			//dx es el pto logica a pintar. Busco que figura es en mapa
+			var i = Math.round(dx/50);
+			var j = Math.round(dy/50);
+			if (!(i<0||i>=mapa[0].length||j<0||j>=mapa.length)){
+				//Si no esta en el mapa es que hemos llegado al borde
+				var figura = mapa[j][i];
+				//sx es la posicion en el browser a pintar
+				//ptoRef seria el 0
+				sx = i*50 - p.ptoRef.X;
+				sy = j*50 - p.ptoRef.Y;
+				dibu.pintaFigura(figura,sx,sy);
+			}
+		}
+	}
+}
+function pintaNave(){
+	//ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+	ctx.save();
+	ctx.translate(centroX+25, centroY+25);
+	ctx.rotate(p.nave.ori*Math.PI/180);
+	ctx.translate(-centroX-25, -centroY-25);
+	if (p.nave.estrella){
+		if (p.nave.estrellaSprt<4){
+			dibu['naveEstrella'+p.nave.estrellaSprt]();
+			p.nave.estrellaSprtTmr -= 1;
+			if (p.nave.estrellaSprtTmr==0){
+				p.nave.estrellaSprt += 1;
+				p.nave.estrellaSprtTmr = 7;
+			}
+		}
+		else {
+p.nave.estrella = false;
+location.reload(true);
+		}
+	}
+	else {
+		if (p.nave.disparando){
+			dibu.naveDispara();
+		}
+		else if (p.nave.girando != 0){
+			if (p.nave.girando > 0){
+				dibu.naveGiraDcha();
+			}
+			else{
+				dibu.naveGiraIzq();
+			}
+		}
+		else if (p.nave.vel>0){
+			dibu.naveAvanza();
+		}
+		else {
+			dibu.naveQuieta();
+		}
+	}
+		//ctx.fillStyle="#FFF";
+		//ctx.fillRect(centroX+2,centroY+2,48,48);
+	ctx.restore();
+}
+
+function pintaMalos(){
+	for (var i=p.malos.length-1; i>=0; i--){
+		var sx = p.malos[i].posX - p.ptoRef.X;
+		var sy = p.malos[i].posY - p.ptoRef.Y;
+		ctx.save();
+		ctx.translate(sx+25, sy+25);
+		ctx.rotate(p.malos[i].ori*Math.PI/180);
+		ctx.translate(-sx-25, -sy-25);
+		dibu.maloEspora(p.malos[i].ori, sx, sy);
+		//ctx.fillStyle="#FFF";
+		//ctx.fillRect(sx+24,sy+24,2,2);
+		ctx.restore();
+	}
+}
+
+function pintaBalas(){
+	for (var i=0; i<p.balas.length; i++){
+		var sx = p.balas[i].posX - p.ptoRef.X;
+		var sy = p.balas[i].posY - p.ptoRef.Y;
+		ctx.save();
+		ctx.translate(sx+5, sy+5);
+		ctx.rotate(p.balas[i].ori*Math.PI/180);
+		ctx.translate(-sx-5, -sy-5);
+		dibu.balaNave(sx,sy);
+		ctx.restore();
+	}
+}
+
+function mueveNave(){
+	if (!p.nave.estrella){
+		p.nave.disparando = false;
+		p.nave.girando = 0;
+		var giro = 3;
+		if (ctl.teclaArriba) {
+			p.nave.vel = C.nVel;
+		}
+		if (p.nave.vel>0){
+			avanzaMovil(p.nave);
+		}
+		if (ctl.teclaDcha) {
+			p.nave.girando = 1;
+			if (p.nave.vel){
+				p.nave.ori += giro;
+			}
+			else {
+				p.nave.ori += 1;
+			}
+		}
+		if (ctl.teclaIzq) {
+			p.nave.girando = -1;
+			if (p.nave.vel){
+				p.nave.ori -= giro;
+			}
+			else {
+				p.nave.ori -= 1;	
+			}
+		}
+		p.nave.ori = p.nave.ori%360;
+
+		if (ctl.barra==1){
+			p.nave.disparando = true;
+			ctl.desactivaBarra();
+			p.nave.dispara = true;
+			var b = new BalaNave();
+			p.balas.push(b);
+		}
+		p.nave.vel = (p.nave.vel<=0.8)?0:p.nave.vel*0.92;
+		//p.nave.ori = va;
+		//p.nave.posX += 5;
+	}
+};
+/* La espora se mueve random. 
+ * Por dar un mov chulo la amplitud de random de orientacion tiene un ciclo de 10 periodos
+ **/
+function mueveMalos(){
+	for (var i=0; i<p.malos.length; i++){
+		var m = new MaloEspora(p.malos[i].posX,p.malos[i].posY,p.malos[i].ori);
+		m.ori += Math.ceil(Math.random()<0.5?-1:1)*Math.round(Math.random()*C.eOriRand[m.oriRand]);
+		if (colliderEspora(m)){
+			m.ori += 120;
+		}
+		avanzaMovil(m);	
+		m.oriRand = (m.oriRand+1) % C.eOriRand.length;
+		p.malos[i].ori = m.ori;
+		p.malos[i].posX = m.posX;
+		p.malos[i].posY = m.posY;
+		if (!p.nave.estrella
+		 && m.posX+25>p.nave.posX
+		 && m.posX+25<p.nave.posX+50
+		 && m.posY+25>p.nave.posY
+		 && m.posY+25<p.nave.posY+50){
+			p.nave.estrella = true;
+			p.nave.estrellaSprt = 0;
+			p.nave.estrellaSprtTmr = 7;
+		}
+	}
+	return;
+}
+
+function mueveBalas(){
+	for (var i=p.balas.length-1; i>=0; i--){
+		var dio = false;
+		avanzaMovil(p.balas[i]);
+		//Si da con espora...
+		for (var j=p.malos.length-1; j>=0; j--){
+			if (!dio 
+			 && p.balas[i].posX+5>p.malos[j].posX+12 
+			 && p.balas[i].posX+5<p.malos[j].posX+37
+			 && p.balas[i].posY+5>p.malos[j].posY+12
+			 && p.balas[i].posY+5<p.malos[j].posY+37){
+			 	explotaEspora(j);
+			 	dio = true;
+			 }
+		}
+		//Si da con pared quitamos la bala
+		if (dio || p.balas[i].posX>mapa[0].length*50 || p.balas[i].posX<0
+			|| p.balas[i].posY>mapa.length*50 || p.balas[i].posY<0){
+			p.balas.splice(i,1);
+		}
+	}
+};
+function muevePtoRef(){
+	p.ptoRef.X = p.nave.posX - centroX;
+	p.ptoRef.Y = p.nave.posY - centroY;
+};
+function colliderNave(){
+	var i = Math.round((p.nave.posX)/50);
+	var j = Math.round((p.nave.posY)/50);
+	if (mapa[j][i]!=0 && !p.nave.estrella){
+		p.nave.estrella = true;
+		p.nave.estrellaSprt = 0;
+		p.nave.estrellaSprtTmr = 7;
+	}
+}
+function colliderEspora(o){
+	var choca = false;
+	var i = Math.round((o.posX)/50);
+	var j = Math.round((o.posY)/50);
+	if (mapa[j][i]!=0){
+		choca = true;
+	}	
+	return choca;
+}
+
+function control() {
+	mueveNave();
+	mueveMalos();
+	mueveBalas();
+	muevePtoRef();
+	colliderNave();
+	pintaMapa();
+	pintaNave();
+	pintaMalos();
+	pintaBalas();
+	window.requestAnimationFrame(control);	
+}
+
+
+function avanzaMovil(movil){
+	deltaX = Math.round(movil.vel*Math.sin(movil.ori*Math.PI/180));
+	deltaY = -Math.round(movil.vel*Math.cos(movil.ori*Math.PI/180));
+	movil.posX += deltaX;
+	movil.posY += deltaY;
+};
+
+function explotaEspora(i){
+	var x0 = p.malos[i].posX;
+	var y0 = p.malos[i].posY;
+	for (var j=0; j<4; j++){
+		var nOri = p.malos[i].ori+(90*j)-90;
+		var nx = x0 + Math.round(25*Math.sin(nOri*Math.PI/180));
+		var ny = y0  -Math.round(25*Math.cos(nOri*Math.PI/180));
+		if (mapa[Math.round(ny/50)][Math.round(nx/50)]==0){
+			p.malos.push(new MaloEspora(nx,ny,nOri));
+		}
+	}
+	p.malos.splice(i,1);
+};
+
+
+
+/*////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////																		//////////////////////////
+//////////////										VARIABLES											//////////////
+///////////////////////																		//////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+
+var constantes = {
+	dimCubo : 50
+};
+
+var BalaNave = function(){
+	this.posX = p.nave.posX+25+Math.round(25*Math.sin(p.nave.ori*Math.PI/180));
+	this.posY = p.nave.posY+25-Math.round(25*Math.cos(p.nave.ori*Math.PI/180));
+	this.ori = p.nave.ori ;
+	this.vel = C.bVel;
+};
+var Nave = function(posX,posY,ori){
+	this.posX = posX;
+	this.posY = posY;
+	this.vel;
+	this.ori = ori;
+	this.girando = 0;
+	this.disparando = false;
+	this.estrella = false;
+	this.estrellaSprt = 0;
+	this.estrellaSprtTmr;
+};
+var MaloEspora = function(posX,posY,ori){
+	this.posX = posX;
+	this.posY = posY;
+	this.vel = C.eVel;
+	this.ori = ori;
+	this.oriRand = 0;
+	this.nace = false;
+	this.muere = false;
+}
+var Pantalla = function(){
+	this.w 		= canvas.width;
+	this.h 		= canvas.height;
+	this.ptoRef = {
+		X: null,
+		Y: null
+	};
+	this.nave;
+	this.malos = [];
+	this.balas = [];
+
+}
+
+
+var mapa = 
+ [[5, 1 , 1 , 1 , 1 , 1, 1 , 1 , 1 , 1 , 1 , 6 ,13 ,13 ,13 ,13 , 5 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,6],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 ,11 , 6 ,13 ,13 , 5 ,12 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 ,11 , 6 , 5 ,12 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 ,11 ,12 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 ,'e', 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,'e', 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 9 ,10 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 9 ,10 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 ,11 ,12 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,11 ,12 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,'N', 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 9 ,10 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 9 ,10 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 ,11 ,12 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,11 ,12 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 ,'e', 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,'e', 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [3, 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,4],
+  [7, 2 , 2 , 2 , 2 , 2, 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,8]];
+
+
+var dibu = {
+	naveQuieta		: function(){ctx.drawImage(folio,   0,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveAvanza		: function(){ctx.drawImage(folio,  50,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveDispara		: function(){ctx.drawImage(folio, 150,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveEstrella0	: function(){ctx.drawImage(folio, 150,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveEstrella1	: function(){ctx.drawImage(folio, 200,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveEstrella2	: function(){ctx.drawImage(folio, 250,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveEstrella3	: function(){ctx.drawImage(folio, 300,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveGiraDcha	: function(){ctx.drawImage(folio, 350,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	naveGiraIzq		: function(){ctx.drawImage(folio, 400,   0,   50, 50, centroX, centroY, 50, 50);}, 
+	balaNave 		: function(sx,sy){ctx.drawImage(folio, 490, 50, 10, 10, sx, sy, 10, 10);},
+	pintaFigura	: function(fig, sx, sy){
+		//ctx.drawImage(folio, 150, 100, 50, 50, sx, sy, 50, 50);
+		switch(fig) {
+			case 1 : ctx.drawImage(folio,  50, 100, 50, 50, sx, sy, 50, 50);break;
+			case 2 : ctx.drawImage(folio, 250, 100, 50, 50, sx, sy, 50, 50);break;
+			case 3 : ctx.drawImage(folio, 200, 100, 50, 50, sx, sy, 50, 50);break;
+			case 4 : ctx.drawImage(folio,   0, 100, 50, 50, sx, sy, 50, 50);break;
+			case 5 : ctx.drawImage(folio, 150, 100, 50, 50, sx, sy, 50, 50);break;
+			case 6 : ctx.drawImage(folio, 100, 100, 50, 50, sx, sy, 50, 50);break;
+			case 7 : ctx.drawImage(folio, 350, 100, 50, 50, sx, sy, 50, 50);break;
+			case 8 : ctx.drawImage(folio, 300, 100, 50, 50, sx, sy, 50, 50);break;
+			case 9 : ctx.drawImage(folio,   0, 150, 50, 50, sx, sy, 50, 50);break;
+			case 10: ctx.drawImage(folio,  50, 150, 50, 50, sx, sy, 50, 50);break;
+			case 11: ctx.drawImage(folio, 400, 100, 50, 50, sx, sy, 50, 50);break;
+			case 12: ctx.drawImage(folio, 450, 100, 50, 50, sx, sy, 50, 50);break;
+			case 13: ctx.drawImage(folio, 100, 150, 50, 50, sx, sy, 50, 50);break;
+		}
+	},
+	maloEspora : function(ori,sx,sy){ctx.drawImage(folio, 1, 51, 49, 49, sx+1, sy+1, 48, 48);	}
+
+};
+
+var C = {
+	nOri : 270,
+	nStrSprtTmr: 7,
+	nVel : 7,
+	bVel : 8,
+	eVel : 2,
+	eOriRand : [5,10,15,20,25,35,40,45,40,35,25,20,15,10],
+}
+
+var p = null;
+
+var setup = function() {
+	p = new Pantalla();
+	folio = new Image();
+	folio.src='img/piceset4.png';
+	direcciones.push(new Image());
+	//direcciones.onload = control();
+	//direcciones[0].src = fotos[0];
+	for (var i=0; i<mapa[0].length; i++){
+		for (var j=0; j<mapa.length; j++){
+			var n = mapa[j][i];
+			if (isNaN(parseFloat(n))){
+				switch (n){
+					case 'N' : p.nave = new Nave(i*50,j*50,C.nOri);break;
+					case 'e' : p.malos.push(new MaloEspora(i*50,j*50,Math.floor(Math.random()*360))); break;
+				}
+				mapa[j][i] = 0;
+			}
+		}
+	}
+	p.nave.ori = C.nOri;
+	p.nave.estrellaSprtTmr = C.nStrSprtTmr;
+	muevePtoRef();
+	control();
+};
+
+setup();
+
+
+
+		</script>
+		</body>
+		</html>
+
+
+
