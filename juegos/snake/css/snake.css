@@ -58,6 +58,18 @@
 			border-radius: 100%;
 			/*border: 1px solid blue;*/
 		}
+		.serpiente {
+			background-color: black;
+			width: 10px;
+			height: 10px;
+			border-radius: 100%;
+		}
+		.pizza {
+			background-color: #111;
+			width: 10px;
+			height: 10px;
+			border-radius: 0px;
+		}
 		#puntuacion {
 			text-align: right;
 			margin-right: 25%;

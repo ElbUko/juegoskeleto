@@ -175,4 +175,55 @@ var Grid = function(wi, he){
 		return lista;	
 	};
 };
-var g = new Grid(3,3);
+
+/*	Almacena en key el valor de la ultima pulsacion
+ * Se codifica 0,1,2,3 para N,E,S,O respectivamente.
+ * Tambien tiene un booleano para tecla pulsada
+ */
+var ControlTeclado = function(event) {
+	this.pausaHabilit = true;
+	var pausa = false,
+		pressing = false,
+		key,
+		last;
+
+	this.getKey = function(){
+		return key;
+	}
+	this.teclaPulsada = function(event){
+		var k = (event)?event.keyCode || event.which : undefined;
+		if (!pausa) {
+			function N() { key = 0;};
+			function E() { key = 1;};
+			function S() { key = 2;};
+			function O() { key = 3;};
+			function B() { key = 'B';};
+			function P() { 
+				key = 'P'
+				pausa = (!this.pausaHabilit || pausa)?false:true;
+			}
+			var teclas = {
+				32 : B,     //Bar
+				37 : E,		//right
+				38 : N,		//up
+				39 : O,		//left
+				40 : S,		//down
+				65 : O,		//A
+				68 : E,		//D
+				80 : P,		//P
+				83 : S,		//S
+				87 : N,  	//W
+			};
+			teclas[k]();
+		}
+		else if(k == 80){
+			key = last;
+			pausa = false;
+		}
+		last = key;
+	}
+};
+
+
+var kc = new ControlTeclado();
+	document.addEventListener("keydown", kc.teclaPulsada, false);

@@ -1,15 +1,154 @@
-/*	Snake
-// Esta vez en vez de almacenar a la serpiente en vector, se va actualizar la cabeza y la estela
-// (pintado y borrado). La estela es blanca y la cabeza negra
+/*
+var Juego = function(){
+	//VALORES Y CONSTANTES
+	var C = {
+		MAXW : 		50,
+		MAXH : 		30,
+		casilla: 	10,
+		vel : 		50,
+		longIni : 	 5,
+		crece: 		 3	
+	}
+	//BANDERAS
+	var B = {
+		seDio : 	 false,
+		pausa : 	 true,
+		valeChocar : false
+	}
 
-MIERDA! para poder mover la cola, necesito la direccion de la serpiente en cada punto, heredao de la cabeza
-asi que he de almacenar en un vector las posiciones del cuerpo.
-Eso si, solo lo recorrere para actualizar la sepiente cuando se mueva
+	//OBJETOS (def)
+	var Serpiente = function(){
+		this.cabeza = G.pushRandom();
+		this.culo = null;			// el que va borrando
+		this.direc = 0;				// N,E,S,O
+		this.creciendo = false;
+		this.cuerpo = [this.cabeza];
+	}
+
+	//OBJETOS (inst)
+	var G = new Grid(C.MAXW, C.MAXH);	
+	var kc = new ControlTeclado();
+	document.addEventListener("keydown", kc.teclaPulsada, false);
+	var serp = new Serpiente();
+	var pizza = G.pushRandom();
+
+	//
+	//GRAFICA
+	var TrataDOM = function(){
+		var body = document.getElementsByTagName("html")[0];
+		var pantalla = pantalla = document.getElementById("pantalla");
+		
+		function creaDiv(id,clas,w,h){
+			caja = document.createElement("div");
+			caja.id = id;
+			if (clas) {caja.className = clas;}
+			if (w) {caja.style.width = w + 'px';}
+			if (h) {caja.style.height = h + 'px';}
+			return caja;
+		}
+		this.generaRejilla = function(G,dx,dy){
+			var caja = creaDiv('caja',null,G.getW()*dx,G.getH()*dy);
+			pantalla.appendChild(caja);
+			for (var i=0; i<G.getH(); i++) {
+				var fila = creaDiv('fila');
+				caja.appendChild(fila);
+				for (var j=0; j<G.getW(); j++) {
+					var id = i+','+j;
+					var casilla = creaDiv(id,'casilla');
+					fila.appendChild(casilla);
+				}
+			}
+		};
+		this.setClase = function(id, clase){
+			console.log(id)
+			var el = document.getElementById(id);
+			el.className = clase;
+		}
+	}
+	var P = new TrataDOM();
+	function pinta(){
+	//serpiente
+		var idCabeza = serp.cabeza.y+','+serp.cabeza.x
+		P.setClase(idCabeza, 'serpiente');
+		if (serp.culo != null){
+			var idCulo = serp.culo.y+','+serp.culo.x
+			P.setClase(idCulo, 'casilla');
+		}
+		var idPizza = pizza.y+','+pizza.x;
+		P.setClase(idPizza,'pizza');
+	}
+	//
+	//MOTOR
+	function miraDireccion(k){
+		if (typeof(k)=='number'){
+			if ((k==0 && serp.direc%2==1) || (k==1 && serp.direc%2==0) ||
+				(k==2 && serp.direc%2==1) || (k==3 && serp.direc%2==0)){
+				serp.direc = k;
+			}
+		}
+	}
+	function collider(p){
+		var avanza = false;
+		if (typeof(p)=='object'){
+			avanza = true;
+		}
+		else if (typeof(p)=='number' && p==pizza.id){
+			pizza = G.pushRandom();
+			avanza = 'pizza';
+		}
+		if (!avanza){
+			choca();
+		}
+		return avanza;
+	};
+	function avanzaSerpiente(p){
+		serp.cabeza = p;
+		serp.cuerpo.unshift(p);
+		if (!serp.creciendo){
+			var c = serp.cuerpo.pop();
+			if (!G.remove(c)) console.log('algo va mal');
+			serp.culo = serp.cuerpo.pop();
+		}
+	}
+	function avanzaJuego(k){
+		miraDireccion(k);
+		var x = (serp.direc%2==1)?serp.cabeza.x+serp.direc-2:serp.cabeza.x;
+		var y = (serp.direc%2==0)?serp.cabeza.y+serp.direc-1:serp.cabeza.y;
+		var p = G.pushXY(x,y);
+		var a = collider(p)
+		if(a){
+			if (a == 'pizza'){
+				p = {id: p, x: x, y: y};
+			}
+			avanzaSerpiente(p);
+		}
+	}
+
+	//
+	//CONTROL
+	this.run = function(){
+		var k = kc.getKey();
+		if (!B.pausa){
+			avanzaJuego(k);
+			pinta();
+			window.requestAnimationFrame(this.run());
+		}
+	}
+	this.prepara = function(){
+		P.generaRejilla(G,C.casilla, C.casilla);
+		pinta();
+		this.run()
+	}
+}
+var J = new Juego();
+console.log('juego creado');
+J.prepara();
 */
-//###########################################################
-//#####				Definicion de variables				#####
-//###########################################################
-//
+ 
+
+
+
+
 document.addEventListener("keydown", controlDeTecla, false);
 
 //Variables basicas del juego
@@ -249,7 +388,7 @@ function naceSerpiente(){
 	serpiente.cuerpo = ['' + serpiente.idEstela, '' + serpiente.idCabeza];
 		//Aqui idCabeza hace la funcion de pto de salida
 };
-function actualizaSerpiente(creciendo) {//Si entra aqui es que no ha chocado, asi que cabeza siempre se actualiza. Si esta creciendo, estela se queda quieta */
+function actualizaSerpiente(creciendo) {//Si entra aqui es que no ha chocado, asi que cabeza siempre se actualiza. Si esta creciendo, estela se queda quieta 
 	if (serpiente.cuerpo.length == 0) {//Aun no ha nacido, se establece la estela tras el mov
 		naceSerpiente();
 	}
@@ -317,6 +456,7 @@ function despintaRojo() {
  PROBLEMAS:
  - serpiente.idCabeza se pasa por referencia, esta va cambiando y el cuerpo va cambiando
  */
+
 function tomaConf() {
 	var velocidad = document.getElementById("velocidad").value;
 	if (velocidad != juego.velocidad){
