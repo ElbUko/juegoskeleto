@@ -6,6 +6,7 @@ var user = document.getElementById("regFormUsr");
 var form = document.getElementById("regForm");
 var cajaLog = document.getElementById("cajaNombre");
 var jskeletobk = "http://juegoskeleto.esy.es/";
+jskeletobk = "http://juegoskeleto.netne.net/";
 
 //Caja de login
 if (defaultUsr.substring(0,8) == "invitado") {

@@ -52,6 +52,7 @@
 
 		.casilla {
 			display: inline-block;
+			background-color: #fff;
 			width: 10px;
 			height: 10px;
 			vertical-align: top;
@@ -59,15 +60,19 @@
 			/*border: 1px solid blue;*/
 		}
 		.serpiente {
+			display: inline-block;
 			background-color: black;
 			width: 10px;
 			height: 10px;
+			vertical-align: top;
 			border-radius: 100%;
 		}
 		.pizza {
+			display: inline-block;
 			background-color: #111;
 			width: 10px;
 			height: 10px;
+			vertical-align: top;
 			border-radius: 0px;
 		}
 		#puntuacion {

@@ -3,7 +3,10 @@
 	Continuo: arkanoid, naves
 
 */
-
+var log = {
+		grid : true,
+		controlTeclado : true
+	}
 /** Codigos de respuesta:
  *		null: fuera de la rejilla
  *		-1: id erroneo
@@ -11,6 +14,7 @@
  *		false: no se pudo
  */
 var Grid = function(wi, he){
+	var log = log && log.grid;
 	if (wi==null || he==null || w != null) return null;
 	//
 	//MODEL
@@ -25,6 +29,9 @@ var Grid = function(wi, he){
 		this.id = Id();
 		this.x = x;
 		this.y = y;
+		this.toString = function(){
+			return '{id: '+id+', x: '+x+', y: '+y+'}';
+		}
 	};
 	function generaRejilla(){
 		var grid = [];
@@ -38,6 +45,7 @@ var Grid = function(wi, he){
 	//
 	//CRUD
 	this.pushXY = function(x, y){
+		if (this.log) console.log('pushxy '+x+' '+y);
 		//ok retun pt, ocupado return id
 		if (x<0 || x>w || y<0 || y>h) return null;
 		if (grid[y][x]==null){
@@ -49,6 +57,7 @@ var Grid = function(wi, he){
 		return grid[y][x];
 	};
 	this.pushPt = function(pt){
+		if (this.log) console.log('pushPt '+pt.toString());
 		//ok retun pt, ocupado return id
 		if (pt.x<0 || pt.x>w || pt.y<0 || pt.y>h) return null;
 		if (grid[pt.y][pt.x]==null){
@@ -59,6 +68,7 @@ var Grid = function(wi, he){
 		return grid[pt.y][pt.x];
 	};
 	this.remove = function(pt){
+		if (log) console.log('remove '+pt.toString());
 		if (pt.x<0 || pt.x>w || pt.y<0 || pt.y>h) return null;
 		if (grid[pt.y][pt.x]==pt.id){
 			grid[pt.y][pt.x]=null;
@@ -68,6 +78,7 @@ var Grid = function(wi, he){
 		return -1;
 	};
 	this.replace = function(pin, pot){
+		if (log) console.log('replace '+pin.toString()+' '+pot.toString());
 		if (pt.x<0 || pt.x>w || pt.y<0 || pt.y>h) return null;
 		if (grid[pot.y][pot.x]==pot.id){
 			grid[pot.y][pot.x]==pin.id;
@@ -131,6 +142,7 @@ var Grid = function(wi, he){
 	//
 	//UTILES
 	this.pushRandom = function(){
+		if (log) console.log('push random');
 		if ((population/(w*h))>0.6){
 			var lista = this.getEmpty();
 		}
@@ -181,6 +193,7 @@ var Grid = function(wi, he){
  * Tambien tiene un booleano para tecla pulsada
  */
 var ControlTeclado = function(event) {
+	var log = log && log.controlTeclado;
 	this.pausaHabilit = true;
 	var pausa = false,
 		pressing = false,
@@ -189,9 +202,19 @@ var ControlTeclado = function(event) {
 
 	this.getKey = function(){
 		return key;
+	};
+	this.pausa = function(){
+		return pausa;
+	}();
+	this.para = function(){
+		pausa = true;
+	}
+	this.continua = function(){
+		pausa = false;
 	}
 	this.teclaPulsada = function(event){
 		var k = (event)?event.keyCode || event.which : undefined;
+		if (log) console.log(k);
 		if (!pausa) {
 			function N() { key = 0;};
 			function E() { key = 1;};
