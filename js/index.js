@@ -5,6 +5,7 @@ var popupMsg = document.getElementById("popSaltaMsg");
 var user = document.getElementById("regFormUsr");
 var form = document.getElementById("regForm");
 var cajaLog = document.getElementById("cajaNombre");
+var jskeletobk = "http://juegoskeleto.esy.es/";
 
 //Caja de login
 if (defaultUsr.substring(0,8) == "invitado") {
@@ -17,11 +18,11 @@ if (defaultUsr.substring(0,8) == "invitado") {
 }
 
 //objeto HTTP_REQUEST
-http_request = false;
-if (window.XMLHttpRequest) {
-	var ajax = new XMLHttpRequest();
+//http_request = false;
+//if (window.XMLHttpRequest) {
+var ajax = new XMLHttpRequest();
 	//Variable global 'ajax' pa ajax
-}
+//}
 function sacaReg(met) {
 	var user = document.getElementById("regFormUsr").value;
 	var pass = document.getElementById("regFormPsswd").value;
@@ -29,7 +30,7 @@ function sacaReg(met) {
 		popupMsg.innerHTML = "¡Hace falta algun nombre de usuario";
 		sacaPopup();
 	} else {
-		ajax.open('POST', "php/control/control.php", true);
+		ajax.open('POST', jskeletobk+"php/control/control.php", true);
 		ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		var envia = "usr=" + user + "&psswd=" + pass;
 		ajax.send(envia);
@@ -38,6 +39,7 @@ function sacaReg(met) {
 
 var result;
 ajax.onreadystatechange = function() {
+	console.log('entra:');
 	if (ajax.readyState == 4) {
 		result = ajax.responseText;
 		respuesta = JSON.parse(result);
@@ -93,7 +95,7 @@ function sacaPopup() {
 }
 
 function hazLogout() {
-	ajax.open('POST', "php/control/control.php", true);
+	ajax.open('POST', jskeletobk+"php/control/control.php", true);
 	ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	var envia = "usr=deslogame&psswd=";
 	ajax.send(envia);
