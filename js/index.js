@@ -1,3 +1,84 @@
+
+var Juegoskeleto = function() {
+	var jskeletobk = "http://juegoskeleto.netne.net/",
+		ajax = function(method, url, data){
+			var xhr = new XMLHttpRequest();
+			xhr.open(method, url, true);
+	        xhr.send(data);
+	        return xhr;
+		},
+		login = {
+			usuario: 	null,
+			invitado: 	true,
+			popup: 		document.getElementById("popSalta"),
+			popupMsg: 	document.getElementById("popSaltaMsg"),
+			form: 		document.getElementById("regForm"),
+			formUsr: 	document.getElementById("regFormUsr"),
+			formPsswd:  document.getElementById("regFormPsswd"),
+			cajaLog: 	document.getElementById("cajaNombre"),
+			cajaUsr:	document.getElementById("cajaNombreTxt"),
+
+			loga: function(){
+				var data = "usr=" + user + "&psswd=" + pass;
+				ajax('POST', jskeletobk+"php/control/control.php", data)
+				.onload = (function(){
+
+				}());
+				
+				this.cajaUsr.innerHTML = this.usuario;
+				this.form.style.display = 'none';
+				this.cajaLog.style.display = 'block';
+
+				if (respuesta.popup) {
+					popupMsg.innerHTML = respuesta.mensajePopup;
+					if (respuesta == undefined)
+						popup.style.backgroundColor = '#faa';
+					else if (respuesta.popup.login)
+						popup.style.backgroundColor = '#afa';
+					else
+						popup.style.backgroundColor = '#faa';
+					popup.style.display = "block";
+					popup.style.opacity = "1";
+					tiemoutId = setTimeout(quitaLoginPopup, 5000);
+				}
+				if (respuesta.login) {
+					defaultUsr = document.getElementById("regFormUsr").value;					///LOGINNN
+					invitado = false;
+					document.getElementById("cajaNombreTxt").innerHTML = defaultUsr;
+					var form = document.getElementById("regForm");
+					form.style.display = 'none';
+					var cajaLog = document.getElementById("cajaNombre");
+					cajaLog.style.display = 'block';
+					document.getElementById("regFormPsswd").value = "";
+				}
+			},
+			desloga: function(){
+				ajax('POST', jskeletobk+'php/control/control.php', "'usr'=deslogame&'psswd'=")
+				.onload = (function(){
+					this.user.placeholder = respuesta.invitado;
+					this.usuario = respuesta.invitado;
+					this.invitado = true;	
+					this.formUsr.value = this.usuario;
+					this.form.style.display = 'block';
+					this.cajaLog.style.display = 'none';
+				}());
+			}
+			ponInvitado: function(){
+				this.formUsr.placeholder = this.usuario;
+			}
+		};
+
+	this.loga = function(){
+		var user = loginView.formUsr.value;
+		var pass = loginView.formPsswd.value;
+		if (user == null || user == ""){
+			login.popupMsg = "¡Hace falta algun nombre de usuario!";
+		} else {
+			login.loga();
+		}
+	};
+}
+
 var tiemoutId,
     respuesta;
 var popup = document.getElementById("popSalta");

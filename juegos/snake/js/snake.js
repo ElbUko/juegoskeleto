@@ -144,7 +144,7 @@ var Juego = function(){
 			var k = kc.getKey();
 			if (log) console.log(k);
 			//if (kc.pausa){
-			if (log) //	console.log('tic');
+			//if (log) console.log('tic');
 				avanzaJuego(k);
 				pinta();
 			//}
