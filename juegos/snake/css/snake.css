@@ -52,7 +52,7 @@
 
 		.casilla {
 			display: inline-block;
-			background-color: #fff;
+			background-color: '';
 			width: 10px;
 			height: 10px;
 			vertical-align: top;

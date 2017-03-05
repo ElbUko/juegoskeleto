@@ -47,7 +47,7 @@ var Grid = function(wi, he){
 	this.pushXY = function(x, y){
 		if (this.log) console.log('pushxy '+x+' '+y);
 		//ok retun pt, ocupado return id
-		if (x<0 || x>w || y<0 || y>h) return null;
+		if (x<0 || x>=w || y<0 || y>=h) return null;
 		if (grid[y][x]==null){
 			var pt = new Punto(x,y);
 			grid[y][x] = pt.id;
@@ -59,7 +59,7 @@ var Grid = function(wi, he){
 	this.pushPt = function(pt){
 		if (this.log) console.log('pushPt '+pt.toString());
 		//ok retun pt, ocupado return id
-		if (pt.x<0 || pt.x>w || pt.y<0 || pt.y>h) return null;
+		if (pt.x<0 || pt.x>=w || pt.y<0 || pt.y>=h) return null;
 		if (grid[pt.y][pt.x]==null){
 			grid[pt.y][pt.x] = pt.id;
 			++population;
@@ -69,7 +69,7 @@ var Grid = function(wi, he){
 	};
 	this.remove = function(pt){
 		if (log) console.log('remove '+pt.toString());
-		if (pt.x<0 || pt.x>w || pt.y<0 || pt.y>h) return null;
+		if (pt.x<0 || pt.x>=w || pt.y<0 || pt.y>=h) return null;
 		if (grid[pt.y][pt.x]==pt.id){
 			grid[pt.y][pt.x]=null;
 			--population;
@@ -79,7 +79,7 @@ var Grid = function(wi, he){
 	};
 	this.replace = function(pin, pot){
 		if (log) console.log('replace '+pin.toString()+' '+pot.toString());
-		if (pt.x<0 || pt.x>w || pt.y<0 || pt.y>h) return null;
+		if (pt.x<0 || pt.x>=w || pt.y<0 || pt.y>=h) return null;
 		if (grid[pot.y][pot.x]==pot.id){
 			grid[pot.y][pot.x]==pin.id;
 			return true;
@@ -87,9 +87,34 @@ var Grid = function(wi, he){
 		return -1;
 	};
 	this.getId = function(x,y){
-		if (x<0 || x>w || y<0 || y>h) return null;
+		if (x<0 || x>=w || y<0 || y>=h) return null;
 		return grid[y][x];
 	};
+	this.getPos = function(id){
+		for (var i=0; i<h; i++){
+			for (var j=0; j<w; j++){
+				if (grid[i][j]==id){
+					return {x: j, y: i};
+				}
+			}
+		}
+		return null;
+	}
+	this.getPt = function(id){
+		var p = this.getPos(id);
+		var r = null;
+		if (p != null){
+			r = {
+				id : id,
+				x : p.x,
+				y : p.y,
+				toString : function(){
+					return '{id: '+id+', x: '+x+', y: '+y+'}';
+				}
+			}
+		}
+		return r;
+	}
 	this.getGrid = function(){
 		return grid;
 	};
@@ -109,8 +134,8 @@ var Grid = function(wi, he){
 	//
 	//COLLIDERS
 	function colliderPos(p,cond,x,y){
-		if (p.x<0 || p.x>w || p.y<0 || p.y>h) return null;
-		if (x<0 || x>w || y<0 || y>h) return null;
+		if (p.x<0 || p.x>=w || p.y<0 || p.y>=h) return null;
+		if (x<0 || x>=w || y<0 || y>=h) return null;
 		if (grid[p.y][p.x]!=p.id) return -1;
 		if (cond){
 			if (grid[y][x] == null){
