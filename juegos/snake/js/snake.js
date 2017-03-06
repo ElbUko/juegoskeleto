@@ -1,4 +1,3 @@
-;
 var Juego = function(){
 	//VALORES Y CONSTANTES
 	var log = true;
@@ -6,7 +5,7 @@ var Juego = function(){
 		MAXW : 		50,
 		MAXH : 		30,
 		casilla: 	10,
-		vel : 		50,
+		velJuego : 	75,
 		longIni : 	 5,
 		crece: 		 3	
 	}
@@ -15,6 +14,12 @@ var Juego = function(){
 		seDio : 	 false,
 		pausa : 	 true,
 		valeChocar : false
+	}
+	var Menu = {
+		vel : document.getElementById('velocidad'),
+		longIni : document.getElementById('longIni'),
+		crece : document.getElementById('crece'),
+		valeChocar : document.getElementById('valeChocar')
 	}
 
 	//OBJETOS (def)
@@ -30,10 +35,12 @@ var Juego = function(){
 	//GRAFICA
 	var TrataDOM = function(){
 		var body = document.getElementsByTagName("html")[0],
-			pantalla = pantalla = document.getElementById("pantalla"),
-			caja,
+			pantalla = document.getElementById("pantalla"),
+			caja = document.getElementById('caja'),
 			timeoutID;
-		
+		if (caja){
+			pantalla.removeChild(caja)
+		}
 		var creaDiv = function(id,clas,w,h){
 			var div = document.createElement("div");
 			div.id = id;
@@ -80,12 +87,12 @@ var Juego = function(){
 	
 
 	var pinta = function(){
-		var idCabeza = serp.cabeza.y+','+serp.cabeza.x
-		P.setClase(idCabeza, 'serpiente');
 		if (serp.culo != null){
 			var idCulo = serp.culo.y+','+serp.culo.x
 			P.setClase(idCulo, 'casilla');
-		}
+		}		//borro 1o por si cruza cabeza y cola quede pintado
+		var idCabeza = serp.cabeza.y+','+serp.cabeza.x
+		P.setClase(idCabeza, 'serpiente');
 		var idPizza = pizza.y+','+pizza.x;
 		P.setClase(idPizza,'pizza');
 	}
@@ -114,7 +121,10 @@ var Juego = function(){
 		else if (typeof(p)=='number'){								//ha chocado:
 			if (p==pizza.id){			
 				comePizza();	
-				avanza = 'pizza';
+				avanza = 'ok';
+			}
+			else if(p==serp.cuerpo[serp.cuerpo.length-1].id){		//Si choca con la estela que va borrando permito
+				avanza = 'ok';
 			}														//else choca consigo misma
 		}
 		else {
@@ -147,7 +157,7 @@ var Juego = function(){
 		if (p!=null){
 			var a = collider(p);
 			if(a){
-				if (a == 'pizza'){
+				if (a == 'ok'){
 					p = {id: p, x: x, y: y, 								//Genero el pt en base al id obtenido de x,y
 						toString : function(){
 							return '{id: '+id+', x: '+x+', y: '+y+'}';
@@ -176,7 +186,7 @@ var Juego = function(){
 				iteraJuego(k);
 				pinta();
 			}
-		}, 1000/10);
+		}, C.velJuego);
 	};
 
 	this.prepara = function(){
@@ -184,8 +194,17 @@ var Juego = function(){
 		pinta();
 		run();
 	}
-}
 
-var J = new Juego();
-J.prepara();
+	this.tomaConf = function(){
+		C.velJuego = 120 - Menu.vel.value;
+		C.crece = Menu.crece.value;
+		C.longIni = Menu.longIni.value;
+	}
+}
+var J;
+function empieza(){
+	J = null;
+	J = new Juego();
+	J.prepara();
+}
 

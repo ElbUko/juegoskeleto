@@ -6,7 +6,7 @@
 		<meta http-equiv="content-language" content="es-ES">
 		<title>Snake</title>
 	</head>
-	<body>
+	<body onload="empieza()">
         
 		<div id="formulario">
 			<br/>
@@ -21,10 +21,10 @@
 			<label ><i><b>Se crece...:</b></i></label>
 			<br/>
 			<label>al nacer:&thinsp;</label>
-			<input type="number" id="nacer" min="1" max="50" placeholder="5" style="margin-left: 10px; width:28px;"/>
+			<input type="number" id="longIni" min="1" max="50" placeholder="5" style="margin-left: 10px; width:28px;"/>
 			<br/>
 			<label>al comer:</label>
-			<input type="number" id="engorda" min="1" max="10" placeholder="3" style="margin-left: 10px; width:28px;"/>
+			<input type="number" id="crece" min="1" max="10" placeholder="3" style="margin-left: 10px; width:28px;"/>
 			<br/>
 			<br style="margin-top:5%;"/>
 			<label><i><b>Al chocar...</b></i></label>
@@ -38,9 +38,9 @@
 			<br/>
 
 			<br style="margin-top:5%;"/>
-			<input type="submit" onclick="tomaConf()" value="Cambiar Ahora" />
+			<input type="submit" onclick="J.tomaConf()" value="Cambiar Ahora" />
 			<br/>
-			<input type="submit" onclick="empiezaPartida()" value="Empezar Asi" />
+			<input type="submit" onclick="empieza()" value="Empezar Asi" />
 		</div>
 		<div id="pantalla">
 
