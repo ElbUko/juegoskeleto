@@ -1,6 +1,5 @@
 var Juego = function(){
 	//VALORES Y CONSTANTES
-	var log = true;
 	var C = {
 		MAXW : 		50,
 		MAXH : 		30,
@@ -11,15 +10,16 @@ var Juego = function(){
 	}
 	//BANDERAS
 	var B = {
-		seDio : 	 false,
+		seDio : 	 null,
 		pausa : 	 true,
-		valeChocar : false
+		valeChocar : false,
+		muere : 	 false
 	}
 	var Menu = {
 		vel : document.getElementById('velocidad'),
 		longIni : document.getElementById('longIni'),
 		crece : document.getElementById('crece'),
-		valeChocar : document.getElementById('valeChocar')
+		valeChocar : document.getElementsByName('valeChocar')[0]
 	}
 
 	//OBJETOS (def)
@@ -137,7 +137,7 @@ var Juego = function(){
 		serp.cuerpo.unshift(p);
 		var crec = serp.creciendo;
 		if (crec){
-			serp.creciendo = (crec>1)?crec-1:false;					// y lo dejo estar, el resto del cuerpo sigue igual
+			serp.creciendo = (crec>=1)?crec-1:false;					// y lo dejo estar, el resto del cuerpo sigue igual
 		}
 		else{														//quito el ultimo elemento
 			if (serp.culo == null){
@@ -171,18 +171,24 @@ var Juego = function(){
 		choca();
 	}
 	var choca = function(){
-		serp.direc = undefined;
+		B.seDio = kc.getKey();
 		P.choca();
+		if (!B.valeChocar){
+			empieza();
+		}
 	}
 
 	//
 	//CONTROL
 	var run = function(){
 		setTimeout(function() {
-			requestAnimationFrame(run);
+			if (!B.muere)
+				requestAnimationFrame(run);
 			var k = kc.getKey();
 			miraDireccion(k);
-			if (serp.direc != undefined){
+			console.log(B.seDio + ' ' + k)
+			if (serp.direc != undefined && B.seDio!=k){
+				B.seDio = null;
 				iteraJuego(k);
 				pinta();
 			}
@@ -198,13 +204,27 @@ var Juego = function(){
 	this.tomaConf = function(){
 		C.velJuego = 120 - Menu.vel.value;
 		C.crece = Menu.crece.value;
-		C.longIni = Menu.longIni.value;
+		serp.creciendo = Menu.longIni.value;
+		B.valeChocar = Menu.valeChocar.checked;
+		console.log(C.velJuego)
+		console.log(C.crece)
+		console.log(C.longIni)
+		console.log(C.valeChocar)
+	}
+	this.mata = function(){
+		B.muere = true;
 	}
 }
 var J;
 function empieza(){
-	J = null;
-	J = new Juego();
-	J.prepara();
+	if (J!=undefined){
+		J.mata();
+		J = null;
+	}
+	setTimeout(function(){
+		J = new Juego();
+		J.tomaConf();
+		J.prepara();
+	}, 200);
 }
 

@@ -2,7 +2,7 @@
 var Juegoskeleto = function() {
 	var jskeletobk = "http://juegoskeleto.netne.net/";
 	this.ajax = function(manejador){
-		var data = 'evt='+manejador+'&usr='+login.formUsr.value+'&psswd='login.formPsswd.value;
+		var data = 'evt='+manejador+'&usr='+login.formUsr.value+'&psswd='+login.formPsswd.value;
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', 'login.php', true);
         xhr.send(login.data.toString()+data);
@@ -18,7 +18,7 @@ var Juegoskeleto = function() {
 				}
 			}
         };
-	},
+	};
 	var	login = {
 		data: {
 			usuario : 		null,
@@ -84,7 +84,7 @@ var Juegoskeleto = function() {
 };
 
 
-
+/*
 
 var tiemoutId,
     respuesta;

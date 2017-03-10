@@ -220,9 +220,9 @@ var Grid = function(wi, he){
 var ControlTeclado = function(event) {
 	var log = log && log.controlTeclado;
 	this.pausaHabilit = true;
-	var pausa = false,
+	var pausa,
 		pressing = false,
-		key,
+		key = undefined,
 		last;
 
 	this.getKey = function(){
@@ -230,7 +230,7 @@ var ControlTeclado = function(event) {
 	};
 	this.pausa = function(){
 		return pausa;
-	}();
+	};
 	this.para = function(){
 		pausa = true;
 	}
@@ -247,8 +247,7 @@ var ControlTeclado = function(event) {
 			function O() { key = 3;};
 			function B() { key = 'B';};
 			function P() { 
-				key = 'P'
-				pausa = (!this.pausaHabilit || pausa)?false:true;
+				pausa = this.pausaHabilit;
 			}
 			var teclas = {
 				32 : B,     //Bar
@@ -264,8 +263,7 @@ var ControlTeclado = function(event) {
 			};
 			teclas[k]();
 		}
-		else if(k == 80){
-			key = last;
+		else if(pausa && k == 80){
 			pausa = false;
 		}
 		last = key;
