@@ -76,7 +76,6 @@ var Juego = function(){
 			window.clearTimeout(timeoutID);
 		}
 		this.pinta = function(){
-			console.log(serp)
 			if (serp.culo != null){
 				var idCulo = serp.culo.y+','+serp.culo.x
 				P.setClase(idCulo, 'casilla');
@@ -208,10 +207,6 @@ var Juego = function(){
 		C.crece = Menu.crece.value || C.crece;
 		serp.creciendo = Menu.longIni.value || C.longIni;
 		B.valeChocar = Menu.valeChocar.checked || false;
-		console.log(C.velJuego)
-		console.log(C.crece)
-		console.log(C.longIni)
-		console.log(B.valeChocar)
 	}
 	this.mata = function(){
 		B.muere = true;
