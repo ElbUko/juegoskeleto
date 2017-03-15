@@ -76,7 +76,30 @@ a {
 	outline: none;
 }
 
+/* ###################################################
+					General
+################################################## */	
 
+.boton{
+    text-align: center;
+    background-color: #6d6;
+    border-radius: 10px;
+    height: 30px;
+    width: 80px;
+    box-shadow: 3px 2px #232;
+    padding-top: 10px;
+}
+.boton:hover{
+    background-color: #8f8;
+    box-shadow: 1px 1px #232;
+    cursor: pointer;
+}
+.boton p{
+    font-family: serif;
+    font-style: italic;
+    font-weight: 700;
+    margin-top: 0px;
+}
 /* ###################################################
 					Portal
 ################################################## */	
