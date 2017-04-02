@@ -1,31 +1,41 @@
 
 var Juegoskeleto = function() {
-	var jskeletobk = "http://juegoskeleto.netne.net/";
-	this.ajax = function(manejador){
-		var data = 'evt='+manejador+'&usr='+login.formUsr.value+'&psswd='+login.formPsswd.value;
+	var jskeletobk = "http://juegoskeleto.netne.net/jskeletobk/puerta.php";
+	var backAlive = false;
+	this.bk = (function(){return backAlive;})();
+	this.ajax = function(manejador){		
+		var data = {
+			'evt': manejador,
+			'usr': login.formUsr.value,
+			'pss': login.formPsswd.value
+		}
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', 'login.php', true);
-        xhr.send(login.data.toString()+data);
+		xhr.open('POST', jskeletobk, true);
+		xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xhr.withCredentials = true;
+        xhr.send(JSON.stringify(data));
         xhr.onreadystatechange = function(){
-        	if (this.readyState == 4 && this.status == 200){
-				try {
-					var resp = this.responseText;
-					login.data = JSON.parse(resp);
-					manejador();
-				}
-				catch(e){
-					console.log("Error en el ws "+e);
+        	if (this.readyState == 4){
+        		if (this.status == 200){
+					try {
+						var resp = this.responseText;
+						login.data = JSON.parse(resp);
+						login[manejador]();
+					}
+					catch(e){
+						console.log("Error en el ws: "+e);
+					}
 				}
 			}
         };
+		return false;
 	};
 	var	login = {
 		data: {
-			usuario : 		null,
-			invitado : 		null,
+			login: 			false,
+			user: 			"",
 			popup: 			false,
-			mensajePopup: 	null,
-			login: 			true
+			popupMsg: 		""
 		},
 		popup: 		document.getElementById("popSalta"),
 		popupMsg: 	document.getElementById("popSaltaMsg"),
@@ -36,53 +46,76 @@ var Juegoskeleto = function() {
 		cajaUsr:	document.getElementById("cajaNombreTxt"),
 
 		ping: function(){
-			if (defaultUsr.substring(0,8) == "invitado") {
-				user.placeholder = defaultUsr;
+			if (this.data.login) {
+				this.cajaUsr.innerHTML = this.data.user;
+				this.form.style.display = 'none';
+				this.cajaLog.style.display = 'block';
 			} else {
-				document.getElementById("cajaNombreTxt").innerHTML = defaultUsr;
-				form.style.display = 'none';
-				cajaLog.style.display = 'block';
-				console.log('usuario');
+				this.formUsr.placeholder = this.data.user;
 			}
+			return false;
 		},
 		loga: function(){
-			if (this.data.popup) {
-				login.popupMsg.innerHTML = login.data.mensajePopup;
-				if (respuesta == undefined)
-					popup.style.backgroundColor = '#faa';
-				else if (respuesta.popup.login)
-					popup.style.backgroundColor = '#afa';
-				else
-					popup.style.backgroundColor = '#faa';
-				popup.style.display = "block";
-				popup.style.opacity = "1";
-				tiemoutId = setTimeout(quitaLoginPopup, 5000);
-			}
 			if (this.data.login) {
-				login.cajaUsr.innerHTML = login.formUsr.value;
-				login.form.display = 'none';
-				login.cajaLog.style.display = 'block';
-				login.formPsswd.value = '';
+				this.form.style.display = 'none';
+				this.cajaUsr.innerHTML = this.formUsr.value;
+				this.cajaLog.style.display = 'block';
+				this.formUsr.value = '';
+				this.formPsswd.value = '';
 			}
+			if (this.data.popup)
+				this.ponPopup();
+			return false;
 		},
 		desloga: function(){
-			login.formUsr.placeholder = login.data.invitado;
-			login.form.style.display = 'block';
-			login.cajaLog.style.display = 'none';
+			this.formUsr.text = '';
+			this.formUsr.placeholder = this.data.user;
+			this.form.style.display = 'block';
+			this.cajaLog.style.display = 'none';
 		},
-		quitaLoginPopup: function(){
+		ponPopup: function(){
+			this.popupMsg.innerHTML = this.data.popupMsg;
+			if (this.data.login)
+				this.popup.style.backgroundColor = '#afa';
+			else
+				this.popup.style.backgroundColor = '#faa';
+			this.popup.style.display = "block";
+			this.popup.style.opacity = "1";
+			tiemoutId = setTimeout(this.quitaPopup, 3000);
+		},
+		quitaPopup: function(){
 			clearTimeout(tiemoutId);
-			if (popup.style.opacity == 0) {
-				popup.style.display = "none";
-				popup.style.opacity == "1";
-				popupMsg.innerHTML = "";
-			} else
-				popup.style.opacity -= "0.01";
-			tiemoutId = setTimeout(quitaLoginPopup, 10);
+			if (login.popup.style.opacity <= 0) {
+				login.popup.style.display = "none";
+				login.popup.style.opacity == "1";
+				login.popupMsg.innerHTML = "";
+				tiemoutId = null;
+			} else{
+				login.popup.style.opacity -= "0.01";
+				tiemoutId = setTimeout(login.quitaPopup, 10);
+			}
 		}
 	};
+	this.loga = function(){
+		if (login.formUsr.value == "" || login.formUsr.value == null) {
+			login.data.popupMsg = "¡Hace falta algun nombre de usuario";
+			login.ponPopup();
+		}
+		else{
+			this.ajax('loga');
+		}
+	};
+	this.desloga = function(){h.ajax('desloga');};
+	this.onLoad = function(a){
+		login.formUsr.value = "";
+		this.ajax('ping');
+	};
 };
-
+var h;
+function onLoad(){
+	h = new Juegoskeleto();
+	h.onLoad();
+};
 
 /*
 

@@ -8,7 +8,7 @@
         <title>JuegosKeleto!</title>
         <link rel="shortcut icon" href="img/pacman/fantasma1.png" type="image/png" />
     </head>
-    <body>
+    <body onload="onLoad()">
     	<div id="nav">
             <div id="NavBtns">
                 <div class="NavBtn">
@@ -24,7 +24,7 @@
             </div>
             <div id="login">
                 <!--Este es el formulario sin registro-->
-                <form id="regForm" action="javascript:sacaReg('act')" method="POST" display="block">
+                <div id="regForm">
                     <div id="regFormFields">
                         <p class="regFormField">
                             <label class="regFormField">
@@ -39,12 +39,12 @@
                             </label>
                         </p>
                     </div>
-                    <button id="btnLogin" type="submit"><h5>Entrar</h5><h6>Sin registro!</h6></button>
-                </form>
+                    <button id="btnLogin" onclick="h.loga()"><h5>Entrar</h5><h6>Sin registro!</h6></button>
+                </div>
                 <!--Esta es la caja cuando estas logao-->
                 <div id="cajaNombre" >
                     <p id="cajaNombreTxt"></p>  
-                    <button id="cajaNombreBtnLogout" onclick="hazLogout()"><h5>Salir</h5></button>
+                    <button id="cajaNombreBtnLogout" onclick="h.desloga()"><h5>Salir</h5></button>
                 </div>
                 <!--Esto es el popup de mensajes del login o no-->
                 <div id="popSalta" class="popupVentana">
