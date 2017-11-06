@@ -12,17 +12,17 @@ var ctx = canvas.getContext('2d');
 //variables para elementos del juego
 var PathBarra = new Path2D();
 var PathBola = new Path2D();
-var velocidadDeBarra;
-var velocidadDeBola;
-var barra ={ x : 0,	y : 0, w : 0, h : 0, v : 0	};			
-var bola = { x : 0,	y : 0, vx: 0, vy: 0, r : 0	};
-var vidas = 3;
 //Constantes de dimensiones
 var proporcionBarraPantallaW = 7;
 var proporcionBarraPantallaH = 50;
 var proporcionLadrilloPantallaW = 16;
 var proporcionLadrilloPantallaH = 20;
 var proporcionVelocidadPantallaH = 60;
+
+//valores de juego
+var velocidadDeBarra = 0,
+	velocidadDeBola = 0,
+	vidas = 3;
 
 function iniciaValores(){
 	var altoDefecto = window.innerHeight*0.9;
@@ -35,20 +35,56 @@ function iniciaValores(){
 		: anchoDefecto
 	canvas.height = alto;
 	canvas.width = ancho;
-	barra.w = ancho/proporcionBarraPantallaW; 
-	barra.h = alto/proporcionBarraPantallaH;
-	bola.r = barra.h*0.7;
-	barra.x = canvas.width/2 - barra.w/2; 
-	barra.y = canvas.height-2*barra.h; 
-	bola.x = canvas.width/2;
-	bola.y = barra.y-bola.r;
-	barra.v = 0;  
-	bola.vx = 0;	
-	bola.vy = 0;
 	velocidadDeBarra = alto/proporcionVelocidadPantallaH;
 	velocidadDeBola = alto/proporcionVelocidadPantallaH;
+	iniciaBarra();
+	iniciaBola();
+	iniciaLadrillos();
 	return;
 };
+var barra ={ 
+	x: 0,	
+	y: 0, 
+	w: 0, 
+	h: 0, 
+	v: 0	
+};			
+function iniciaBarra(){
+	barra.w = ancho/proporcionBarraPantallaW; 
+	barra.h = alto/proporcionBarraPantallaH;
+	barra.x = canvas.width/2 - barra.w/2; 
+	barra.y = canvas.height - 2*barra.h; 
+	barra.v = 0;  	
+}
+var bola = { 
+	x:  0,	
+	y:  0, 
+	vx: 0, 
+	vy: 0, 
+	r:  0	
+};
+function iniciaBola(){
+	bola.r = barra.h*0.7;
+	bola.x = canvas.width/2;
+	bola.y = barra.y-bola.r;
+	bola.vx = 0;	
+	bola.vy = 0;
+}
+var cajas = {
+	x:  0, 
+	y:  0, 
+	w:  0, 
+	h:  0, 
+	nw: 0, 
+	nh: 0 
+};
+function iniciaLadrillos(){
+	cajas.w = ancho/proporcionLadrilloPantallaW;
+	cajas.h = alto/proporcionLadrilloPantallaH;
+	cajas.nw = proporcionLadrilloPantallaW - 2;
+	var filas = Math.floor(alto/(2*proporcionLadrilloPantallaH));
+	cajas.nh = filas>6 ? 6 : filas;
+}
 iniciaValores();
 
 //Construyo ladrillos
@@ -56,8 +92,9 @@ var mallaLadrillos = {
 	w: ancho/proporcionLadrilloPantallaW,
 	h: alto/proporcionLadrilloPantallaH,
 	nw: proporcionLadrilloPantallaW - 2,	//Cuantos ladrillos
-	H: 6
+	H: Math.floor((alto/(2*proporcionLadrilloPantallaH))-6)
 };
+console.log(mallaLadrillos.H)
 mallaLadrillos.x = (canvas.width-mallaLadrillos.w*mallaLadrillos.nw)/2;
 mallaLadrillos.y = canvas.height*0.15;
 var ladrillos = [];
@@ -65,9 +102,9 @@ function sacaLadrillos(){
 	//console.log('VOY a GENERAAAAR!! '+ ladrillos.length);
 	ladrillos = [];
 	//console.log('booro '+ladrillos.length);
-	for (var i=0; i<mallaLadrillos.nw; i++){
-		var dureza = mallaLadrillos.H/2;
-		for (var j=0; j<mallaLadrillos.H; j++){
+	for (var i=0; i<cajas.nw; i++){
+		var dureza = cajas.nh/2;
+		for (var j=0; j<cajas.nh; j++){
 			dureza = dureza - (j+1)%2;					 //Valido para altura 6
 			var ladrillo = {
 				x : mallaLadrillos.x+mallaLadrillos.w*i,
