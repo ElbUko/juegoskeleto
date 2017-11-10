@@ -12,107 +12,110 @@ var ctx = canvas.getContext('2d');
 //variables para elementos del juego
 var PathBarra = new Path2D();
 var PathBola = new Path2D();
-//Constantes de dimensiones
-var barraPantallaPropocionW = 7;
-var barraPantallaPropocionH = 50;
-var ladrilloPantallaProporcionW = 16;
-var ladrilloPantallaProporcionH = 20;
-var velocidadEnPropLadoMinimo = 60;
-//valores de juego
-var velocidadDeBarra = 0;
-var velocidadDeBola = 0;
 var vidas = 3;
 var barra ={ 
-	x: 0,	y: 0, w: 0, h: 0, v: 0	
+	x: 0,	y: 0, w: 0, h: 0, v: 0, v0: 0
 };			
 var bola = { 
-	x:  0,	y:  0, vx: 0, vy: 0, r:  0	
+	x:  0,	y:  0, vx: 0, vy: 0, v0: 0, r:  0	
 };
 var cajas = {
 	x:  0, y:  0, w:  0, h:  0, nw: 0, nh: 0 
 };
 var ladrillos = [];
 
-function inicializaTodo(){
-	inicializaPantalla();
-	inicializaBarra();
-	inicializaBola();
-	inicializaVelocidades();
-	inicializaLadrillos();
-	return;
-};
-function inicializaVida(){
-	inicializaBarra();
-	inicializaBola();
-	inicializaVelocidades();
-	return;
-};
-function inicializaPantalla(){
-	var altoDefecto = window.innerHeight*0.9;
-	var anchoDefecto = window.innerWidth*0.6;
-	alto = altoDefecto > MAXALTO
-		? MAXALTO
-		: altoDefecto;
-	ancho = anchoDefecto > MAXANCHO
-		? MAXANCHO
-		: anchoDefecto;
-	canvas.height = alto;
-	canvas.width = ancho;
-}
-function inicializaVelocidades(){
-	var ladoMinimo = alto < ancho 
-		? alto 
-		: ancho;
-	velocidadDeBarra = ladoMinimo/velocidadEnPropLadoMinimo;
-	velocidadDeBola = ladoMinimo/velocidadEnPropLadoMinimo;
-}
-function inicializaBarra(){
-	barra.w = ancho/barraPantallaPropocionW; 
-	barra.h = alto/barraPantallaPropocionH;
-	barra.x = canvas.width/2 - barra.w/2; 
-	barra.y = canvas.height - 2*barra.h; 
-	barra.v = 0;  	
-}
-function inicializaBola(){
-	bola.r = barra.h*0.7;
-	bola.x = canvas.width/2;
-	bola.y = barra.y-bola.r;
-	bola.vx = 0;	
-	bola.vy = 0;
-}
-function cargaMatrizLadrillos(){
-	ladrillos = [];
-	for (var i=0; i<cajas.nw; i++){
-		var dureza = cajas.nh/2;
-		for (var j=0; j<cajas.nh; j++){
-			dureza = dureza - (j+1)%2;					 //Valido para altura 6
-			var ladrillo = {
-				x : cajas.x+cajas.w*i,
-				y : cajas.y+cajas.h*j,
-				w : cajas.w,
-				h : cajas.h,
-				d : dureza
-			};
-			ladrillos.push(ladrillo);
-		}
-	}
-	return;
-};
-function inicializaLadrillos(){
-	var anchuraLadrillo = ancho/ladrilloPantallaProporcionW;
-	var alturaLadrillo = alto/ladrilloPantallaProporcionH;
-	var numeroLadrillosAncho = ladrilloPantallaProporcionW - 2;
-	cajas.w = anchuraLadrillo;
-	cajas.h = alturaLadrillo;
-	cajas.nw = numeroLadrillosAncho;
-	cajas.nh = 6;
-	cajas.x = (ancho - (anchuraLadrillo * numeroLadrillosAncho))/2
-	cajas.y = alto * 0.15;
-	
-	cargaMatrizLadrillos();
-}
-inicializaTodo();
 
+//###########################################################
+//#####			Inicializacion de variables				#####
+//###########################################################
+//
+class Inicializa {
+	constructor() {
+		var barraPantallaPropocionW = 7;
+		var barraPantallaPropocionH = 50;
+		var ladrilloPantallaProporcionW = 16;
+		var ladrilloPantallaProporcionH = 20;
+		var velocidadEnPropLadoMinimo = 60;
+ 	
+		function inicializaPantalla(){
+			var altoDefecto = window.innerHeight*0.9;
+			var anchoDefecto = window.innerWidth*0.6;
+			alto = altoDefecto > MAXALTO
+				? MAXALTO
+				: altoDefecto;
+			ancho = anchoDefecto > MAXANCHO
+				? MAXANCHO
+				: anchoDefecto;
+			canvas.height = alto;
+			canvas.width = ancho;
+		}
+		function inicializaBarra(){
+			barra.w = ancho/barraPantallaPropocionW; 
+			barra.h = alto/barraPantallaPropocionH;
+			barra.x = canvas.width/2 - barra.w/2; 
+			barra.y = canvas.height - 2*barra.h; 
+			barra.v = 0;  	
+		}
+		function inicializaBola(){
+			bola.r = barra.h*0.7;
+			bola.x = canvas.width/2;
+			bola.y = barra.y-bola.r;
+			bola.vx = 0;	
+			bola.vy = 0;
+		}
+		function inicializaVelocidades(){
+			var ladoMinimo = alto < ancho 
+				? alto 
+				: ancho;
+			barra.v0 = ladoMinimo/velocidadEnPropLadoMinimo;
+			bola.v0 = ladoMinimo/velocidadEnPropLadoMinimo;
+		}
+		function cargaMatrizLadrillos(){
+			ladrillos = [];
+			for (var i=0; i<cajas.nw; i++){
+				var dureza = cajas.nh/2;
+				for (var j=0; j<cajas.nh; j++){
+					dureza = dureza - (j+1)%2;					 //Valido para altura 6
+					var ladrillo = {
+						x : cajas.x+cajas.w*i,
+						y : cajas.y+cajas.h*j,
+						w : cajas.w,
+						h : cajas.h,
+						d : dureza
+					};
+					ladrillos.push(ladrillo);
+				}
+			}
+			return;
+		};
+		function inicializaLadrillos(){
+			cajas.w = ancho/ladrilloPantallaProporcionW;
+			cajas.h = alto/ladrilloPantallaProporcionH;
+			cajas.nw = ladrilloPantallaProporcionW - 2;
+			cajas.nh = 6;
+			cajas.x = (ancho - (cajas.w * cajas.nw))/2
+			cajas.y = alto * 0.15;
+			console.log(cajas.w)
+			cargaMatrizLadrillos();
+		}
+		this.inicializaTodo = function(){
+			inicializaPantalla();
+			inicializaBarra();
+			inicializaBola();
+			inicializaVelocidades();
+			inicializaLadrillos();
+			return;
+		};
+		this.inicializaVida = function(){
+			inicializaBarra();
+			inicializaBola();
+			inicializaVelocidades();
+			return;
+		};
+	}
+}
+var ini = new Inicializa();
+ini.inicializaTodo();
 //Construyo ladrillos
 
 //###########################################################
@@ -136,7 +139,7 @@ function control(){
 function perdiste(){
 	vidas -= 1;
 	pausaJuego = true;
-	inicializaVida();
+	ini.inicializaVida();
 	return;
 };	
 function ganaste(){
@@ -220,8 +223,8 @@ function actualizaBola(){
 		var centro = barra.x + barra.w/2;
 		var grados = Math.abs(bola.x - centro) - 90;			//Cutre ñapa. solo vale para barra.w=120
 		var radianes = (Math.PI/180)*grados;
-		bola.vx = Math.cos(radianes)*velocidadDeBola;
-		bola.vy = Math.sin(radianes)*velocidadDeBola;
+		bola.vx = bola.v0 * Math.cos(radianes);
+		bola.vy = bola.v0 * Math.sin(radianes);
 		if (bola.x < centro){
 			bola.vx = -bola.vx;
 		}
@@ -325,22 +328,22 @@ document.addEventListener("keyup",sueltaTecla,false);
 function aprietaTecla(evt) {
 	if (evt.keyCode == 39 && !pressingR) {	//Dcha
 		pressingR = true;
-		barra.v = velocidadDeBarra;	
+		barra.v = barra.v0;	
 	}
 	else if (evt.keyCode == 37 && !pressingL) {	//Izq
 		pressingL = true;
-		barra.v = -velocidadDeBarra;
+		barra.v = -barra.v0;
 	}
 	else if (evt.keyCode == 32 && bola.vy == 0){ //Barra esp
 		if (vidas == 0){
 			vidas = 3;
-			inicializaTodo();
+			ini.inicializaTodo();
 			control();
 		}
 		else {
 			var direcc = Math.random()*Math.PI/3+Math.PI/3;
-			bola.vx = velocidadDeBola*Math.cos(direcc);
-			bola.vy = -velocidadDeBola*(Math.sin(direcc));
+			bola.vx = bola.v0 * Math.cos(direcc);
+			bola.vy = -bola.v0 * Math.sin(direcc);
 			pausaJuego = false;
 			control();
 		}
