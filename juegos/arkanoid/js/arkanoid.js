@@ -155,7 +155,7 @@ class Control {
 			}
 		};
 		this.pausa = function(){
-			if (pausaJuego){
+			if (pausaJuego && (bola.vx != 0 || bola.vy != 0)){
 				pausaJuego = false;
 				control();
 			} else {
