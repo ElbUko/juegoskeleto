@@ -70,6 +70,15 @@ class Inicializa {
 			barra.v0 = ladoMinimo/velocidadEnPropLadoMinimo;
 			bola.v0 = ladoMinimo/velocidadEnPropLadoMinimo;
 		}
+		function inicializaLadrillos(){
+			cajas.w = ancho/ladrilloPantallaProporcionW;
+			cajas.h = alto/ladrilloPantallaProporcionH;
+			cajas.nw = ladrilloPantallaProporcionW - 2;
+			cajas.nh = 6;
+			cajas.x = (ancho - (cajas.w * cajas.nw))/2
+			cajas.y = alto * 0.15;
+			cargaMatrizLadrillos();
+		}
 		function cargaMatrizLadrillos(){
 			ladrillos = [];
 			for (var i=0; i<cajas.nw; i++){
@@ -88,16 +97,6 @@ class Inicializa {
 			}
 			return;
 		};
-		function inicializaLadrillos(){
-			cajas.w = ancho/ladrilloPantallaProporcionW;
-			cajas.h = alto/ladrilloPantallaProporcionH;
-			cajas.nw = ladrilloPantallaProporcionW - 2;
-			cajas.nh = 6;
-			cajas.x = (ancho - (cajas.w * cajas.nw))/2
-			cajas.y = alto * 0.15;
-			console.log(cajas.w)
-			cargaMatrizLadrillos();
-		}
 		this.inicializaTodo = function(){
 			inicializaPantalla();
 			inicializaBarra();
@@ -122,6 +121,51 @@ ini.inicializaTodo();
 //#####			Control del ciclo de juego 				#####
 //###########################################################
 //
+
+class Control {
+	constructor() {
+		function reiniciaJuego(){
+			vidas = 3;
+			ini.inicializaTodo();
+			control();
+		};
+		function empiezaTurno(){
+			arrancaBola();
+			pausaJuego = false;
+			control();
+		}
+		function arrancaBola(){
+			var direcc = Math.random()*Math.PI/3+Math.PI/3;
+			bola.vx = bola.v0 * Math.cos(direcc);
+			bola.vy = -bola.v0 * Math.sin(direcc);
+		}
+		this.mueveBarraDcha = function(){
+			pressingR = true;
+			barra.v = barra.v0;	
+		};
+		this.mueveBarraIzq = function(){
+			pressingL = true;
+			barra.v = -barra.v0;
+		};
+		this.accionDeBarra = function(){
+			if (vidas == 0){
+				reiniciaJuego();
+			} else {
+				empiezaTurno();
+			}
+		};
+		this.pausa = function(){
+			if (pausaJuego){
+				pausaJuego = false;
+				control();
+			} else {
+				pausaJuego = true;
+			}
+		};
+	}
+}
+var ctrl = new Control();
+
 function control(){
 	pinta();
 	if ((pressingL || pressingR)){	//Si estas apretando mueves barra
@@ -326,36 +370,18 @@ document.addEventListener("keydown",aprietaTecla,false);
 document.addEventListener("keyup",sueltaTecla,false);
 
 function aprietaTecla(evt) {
-	if (evt.keyCode == 39 && !pressingR) {	//Dcha
-		pressingR = true;
-		barra.v = barra.v0;	
+	if (evt.keyCode == 39 && !pressingR) {
+		ctrl.mueveBarraDcha();
 	}
-	else if (evt.keyCode == 37 && !pressingL) {	//Izq
-		pressingL = true;
-		barra.v = -barra.v0;
+	else if (evt.keyCode == 37 && !pressingL) {
+		ctrl.mueveBarraIzq();
 	}
-	else if (evt.keyCode == 32 && bola.vy == 0){ //Barra esp
-		if (vidas == 0){
-			vidas = 3;
-			ini.inicializaTodo();
-			control();
-		}
-		else {
-			var direcc = Math.random()*Math.PI/3+Math.PI/3;
-			bola.vx = bola.v0 * Math.cos(direcc);
-			bola.vy = -bola.v0 * Math.sin(direcc);
-			pausaJuego = false;
-			control();
-		}
+	else if (evt.keyCode == 32 && bola.vy == 0){
+		ctrl.accionDeBarra();
 	}
-	else if (evt.keyCode == 80){ // Tecla p
-		if (pausaJuego){
-			pausaJuego = false;
-			control();
-		}
-		else {
-			pausaJuego = true;
-		}
+	else if (evt.keyCode == 80){
+		// Tecla p
+		ctrl.pausa();
 	}
 	return;
 };
