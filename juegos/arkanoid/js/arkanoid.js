@@ -1,8 +1,9 @@
   //
  // VARIABLES GLOBALES
 //
-var MAXANCHO = 800,
-	MAXALTO = 500;
+var PROPORCION = 0.625,
+	MAXANCHO = 800,
+	MAXALTO = MAXANCHO * PROPORCION;
 var pausaJuego = true,
 	nivelSuperado = false;
 var alto, ancho;
@@ -38,8 +39,8 @@ class Inicializa {
 		var velocidadEnPropLadoMinimo = 60;
  	
 		function inicializaPantalla(){
-			var altoDefecto = window.innerHeight*0.9;
-			var anchoDefecto = window.innerWidth*0.6;
+			var anchoDefecto = window.innerWidth*0.7;
+			var altoDefecto = anchoDefecto*PROPORCION;
 			alto = altoDefecto > MAXALTO
 				? MAXALTO
 				: altoDefecto;
@@ -140,11 +141,11 @@ class Control {
 			bola.vy = -bola.v0 * Math.sin(direcc);
 		}
 		this.mueveBarraDcha = function(){
-			pressingR = true;
+			apretandoDch = true;
 			barra.v = barra.v0;	
 		};
 		this.mueveBarraIzq = function(){
-			pressingL = true;
+			apretandoIzq = true;
 			barra.v = -barra.v0;
 		};
 		this.accionDeBarra = function(){
@@ -168,7 +169,7 @@ var ctrl = new Control();
 
 function control(){
 	pinta();
-	if ((pressingL || pressingR)){	//Si estas apretando mueves barra
+	if ((apretandoIzq || apretandoDch)){	
 		actualizaBarra();
 	}
 	if (!pausaJuego){
@@ -363,17 +364,17 @@ function pinta(){
 //#####				   Control de Teclado				#####
 //###########################################################
 //
-pressingL = false;
-pressingR = false;
+apretandoIzq = false;
+apretandoDch = false;
 
 document.addEventListener("keydown",aprietaTecla,false);
 document.addEventListener("keyup",sueltaTecla,false);
 
 function aprietaTecla(evt) {
-	if (evt.keyCode == 39 && !pressingR) {
+	if (evt.keyCode == 39 && !apretandoDch) {
 		ctrl.mueveBarraDcha();
 	}
-	else if (evt.keyCode == 37 && !pressingL) {
+	else if (evt.keyCode == 37 && !apretandoIzq) {
 		ctrl.mueveBarraIzq();
 	}
 	else if (evt.keyCode == 32 && bola.vy == 0){
@@ -388,10 +389,10 @@ function aprietaTecla(evt) {
 
 function sueltaTecla(evt) {
   	if (evt.keyCode == 39) {
-  		pressingR = false;
+  		apretandoDch = false;
   	}
   	else if (evt.keyCode == 37) {
-  		pressingL = false;
+  		apretandoIzq = false;
   	}
   	return;
 };
