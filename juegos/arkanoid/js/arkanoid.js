@@ -128,23 +128,36 @@ class Control {
 		function reiniciaJuego(){
 			vidas = 3;
 			ini.inicializaTodo();
-			control();
+			ctrl.control();
 		};
 		function empiezaTurno(){
 			arrancaBola();
 			pausaJuego = false;
-			control();
+			ctrl.control();
 		}
 		function arrancaBola(){
 			var direcc = Math.random()*Math.PI/3+Math.PI/3;
 			bola.vx = bola.v0 * Math.cos(direcc);
 			bola.vy = -bola.v0 * Math.sin(direcc);
 		}
-		this.mueveBarraDcha = function(){
+		this.control = function(){
+			pinta();
+			if ((apretandoIzq || apretandoDch)){	
+				actualizaBarra();
+			}
+			if (!pausaJuego){
+				actualizaBola();
+				window.requestAnimationFrame(ctrl.control);
+			}
+			else {
+				mensajea();
+			}
+		};
+		this.mueveDcha = function(){
 			apretandoDch = true;
 			barra.v = barra.v0;	
 		};
-		this.mueveBarraIzq = function(){
+		this.mueveIzq = function(){
 			apretandoIzq = true;
 			barra.v = -barra.v0;
 		};
@@ -158,41 +171,26 @@ class Control {
 		this.pausa = function(){
 			if (pausaJuego && (bola.vx != 0 || bola.vy != 0)){
 				pausaJuego = false;
-				control();
+				ctrl.control();
 			} else {
 				pausaJuego = true;
 			}
 		};
+		this.perdiste = function(){
+			vidas -= 1;
+			pausaJuego = true;
+			ini.inicializaVida();
+		}	
+		this.ganaste = function(){
+			pausaJuego = true;
+			nivelSuperado = true;
+			mensajea();
+		}
 	}
 }
 var ctrl = new Control();
 
-function control(){
-	pinta();
-	if ((apretandoIzq || apretandoDch)){	
-		actualizaBarra();
-	}
-	if (!pausaJuego){
-		actualizaBola();
-		window.requestAnimationFrame(control);
-	}
-	else {
-		mensajea();
-	}
-	return;
-};		
-function perdiste(){
-	vidas -= 1;
-	pausaJuego = true;
-	ini.inicializaVida();
-	return;
-};	
-function ganaste(){
-	pausaJuego = true;
-	nivelSuperado = true;
-	mensajea();
-	return;
-}
+		
 
 function mensajea(){
 	if (vidas == 0){
@@ -280,7 +278,7 @@ function actualizaBola(){
 	//}
 	//Perdida de juego
 	if (bola.y-2*bola.r>canvas.height){
-		perdiste();		
+		ctrl.perdiste();		
 	}
 	return;
 }
@@ -325,7 +323,7 @@ function choca(i,x,y){
 		ladrillos[i].d -= 1;
 	}
 	if (ladrillos.length == 0)	//Compurebo acabo
-		ganaste();
+		ctrl.ganaste();
 	if (y)				//Reboto
 		bola.vy = -bola.vy;
 	if (x)
@@ -372,10 +370,10 @@ document.addEventListener("keyup",sueltaTecla,false);
 
 function aprietaTecla(evt) {
 	if (evt.keyCode == 39 && !apretandoDch) {
-		ctrl.mueveBarraDcha();
+		ctrl.mueveDcha();
 	}
 	else if (evt.keyCode == 37 && !apretandoIzq) {
-		ctrl.mueveBarraIzq();
+		ctrl.mueveIzq();
 	}
 	else if (evt.keyCode == 32 && bola.vy == 0){
 		ctrl.accionDeBarra();
