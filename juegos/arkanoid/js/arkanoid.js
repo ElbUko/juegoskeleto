@@ -286,32 +286,28 @@ function actualizaBola(){
 function actualizaLadrillos(){
 	for (var i=0; i<ladrillos.length; i++){
 		//choque en paredes
-		if ((bola.vy<0)&&			//Va parriba
+		var tocaArriba =  ((bola.vy<0)&&	
 			(bola.y-bola.r<=ladrillos[i].y+ladrillos[i].h)&&(bola.y-bola.r>ladrillos[i].y)&&
-			(bola.x+bola.r/2>ladrillos[i].x)&&(bola.x-bola.r/2<ladrillos[i].x+ladrillos[i].w)){
-				choca(i,false,true);
-				break;
-		}
-		if ((bola.vy>0)&& 					//Esta bajando
+			(bola.x+bola.r/2>ladrillos[i].x)&&(bola.x-bola.r/2<ladrillos[i].x+ladrillos[i].w));
+		var tocaAbajo = ((bola.vy>0)&&
 			(bola.y+bola.r>=ladrillos[i].y)&&(bola.y+bola.r<ladrillos[i].y+ladrillos[i].h)&&
-			(bola.x+bola.r/2>ladrillos[i].x)&&(bola.x-bola.r/2<ladrillos[i].x+ladrillos[i].w)){
-				choca(i,false,true);
-				break;
-		}					
-		if ((bola.vx<0)&&			//Va a izq y pega el extremo izq de la bola con la pared dcha del ladrillo
+			(bola.x+bola.r/2>ladrillos[i].x)&&(bola.x-bola.r/2<ladrillos[i].x+ladrillos[i].w));
+		var tocaIzq = ((bola.vx<0)&&
 			(bola.x-bola.r>ladrillos[i].x)&&(bola.x-bola.r<=ladrillos[i].x+ladrillos[i].w)&&
-			(bola.y+bola.r/2>=ladrillos[i].y)&&(bola.y-bola.r/2<=ladrillos[i].y+ladrillos[i].h)){
-				choca(i,true,false);
-				break;
-		}
-		if ((bola.vx>0) &&			//Alreves
+			(bola.y+bola.r/2>=ladrillos[i].y)&&(bola.y-bola.r/2<=ladrillos[i].y+ladrillos[i].h));
+		var tocaDcha = ((bola.vx>0) &&
 			(bola.x+bola.r>=ladrillos[i].x)&&(bola.x+bola.r<ladrillos[i].x+ladrillos[i].w)&&
-			(bola.y+bola.r/2>=ladrillos[i].y)&&(bola.y-bola.r/2<=ladrillos[i].y+ladrillos[i].h)){
-				choca(i,true,false);
-				break;
+			(bola.y+bola.r/2>=ladrillos[i].y)&&(bola.y-bola.r/2<=ladrillos[i].y+ladrillos[i].h));
+
+		else if (tocaArriba || tocaAbajo){
+			choca(i,false,true);
+			break;
+		}
+		else if (tocaDcha || tocaIzq){
+			choca(i,true,false);
+			break;
 		}
 	}
-	return;
 }
 function choca(i,x,y){
 	//console.log('ladris = ' + ladrillos.length + ' Dureza: '+ladrillos[i].d);
