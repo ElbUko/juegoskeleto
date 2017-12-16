@@ -1,0 +1,144 @@
+@charset "UTF-8";
+
+img {
+	user-drag: none;
+}
+#editor {
+    display: block;
+    margin-top: 2%;
+    padding: 0px;
+    text-align: center;
+    border: 0px;
+    height: 80%;
+}
+#menu {
+    display: inline-block;
+    vertical-align: top;
+    background-color: #aaa;
+    width: 96px;
+    height: 440px;
+}
+#mapa{ 
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+}
+#opciones {
+    display: inline-block;
+    height: 100%;
+    width: 114px;
+}
+.filaMenu{
+    display: block;
+    height: 49px;
+}
+.elemMenu {
+    width: 40px;
+    background-color: black;
+    border: 4px solid #aaa;
+    vertical-align: middle;
+    float: left;
+}
+.elemMenu:hover{
+    border: 4px solid orange;
+}
+.elemMenuSel {
+    width: 40px;
+    background-color: black;
+    border: 4px solid #6f0;
+    vertical-align: middle;
+    float: left;
+}
+.filaMapa {
+    display: block;
+    height: 30px;
+    background-color: black;
+}
+.elemMapa {
+    display: inline-block;
+    border-top: 1px solid white;
+    border-right: 1px solid white;
+    width: 30px;
+    height: 30px;
+    margin: 0px;
+    padding: 0px;
+}
+.elemMapaBonito {
+    border-top: 0px;
+    border-right: 0px;
+}
+.elemMapa:hover{
+    background-color: orange;
+    opacity: 0.5;
+}
+.elemMapaImg {
+    width: 30px;
+    height: 30px;
+    margin: 0px;
+    padding: 0px;
+}
+opciones,div {
+    height: 70px;
+    text-align: left;
+}
+div, img {
+    /*-webkit-touch-callout: none;*/
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#opciones div p{
+    font-style: italic; font-family: courier;margin-bottom:0px;
+}
+#masC, #menosC, #masF, #menosF{
+    width: 30px;
+}
+.opcion{
+    border: 2px solid white;
+    border-radius: 5px;
+}
+.opcion:hover{
+    border: 2px solid black;
+    border-radius: 5px;
+}
+#nombre {
+    width: 114px;
+}
+#guardar{
+    text-align: center;
+    background-color: #6d6;
+    border-radius: 10px;
+    height: 30px;
+    width: 80px;
+    box-shadow: 3px 2px #232;
+    padding-top: 10px;
+}
+#guardar:hover{
+    background-color: #8f8;
+    box-shadow: 1px 1px #232;
+    cursor: pointer;
+}
+#guardar p{
+    font-family: serif;
+    font-style: italic;
+    font-weight: 700;
+    margin-top: 0px;
+}
+a:link, a:visited, a:hover, a:active{
+    text-decoration: none;
+    color: black;
+}
+#mapasUsuarios{
+    background-color: #9d9;
+    width: 20%;
+    border-radius: 0.5em;
+    padding: 0.5em;
+    font-family: fantasy;
+    font-weight: bold;
+}
+.deshabilitado{
+	opacity: 0.3;
+	background-color: #ddd;
+}

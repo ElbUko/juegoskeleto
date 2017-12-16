@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8"></meta>
+        <META NAME="AUTHOR" CONTENT="elb uko">
+        <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="es-ES">
+        <title>Pacman - editor de niveles</title>
+        <link rel="stylesheet" type="text/css" href="../../css/ppal.css">
+        <link rel="stylesheet" type="text/css" href="editor.css">
+        </head>
+    <body>
+        <div id="editor">
+            <div id="menu">
+            	<div class="filaMenu">
+            		<img id="pacmanE1" class="elemMenuSel" src="../img/pacmanE1.png" onmousedown="return false;" />
+            		<img id="fantasma1" class="elemMenu" src="../img/fantasma1.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="fantasma2" class="elemMenu" src="../img/fantasma2.png" onmousedown="return false;" />
+                    <img id="fantasma3" class="elemMenu" src="../img/fantasma3.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+            		<img id="bola" class="elemMenu" src="../img/bola.png" onmousedown="return false;" />
+                	<img id="bolon" class="elemMenu" src="../img/bolon.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="par20V" class="elemMenu" src="../img/par20V.png" onmousedown="return false;" />
+                    <img id="par20H" class="elemMenu" src="../img/par20H.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="par20NO" class="elemMenu" src="../img/esq20NO.png" onmousedown="return false;" />
+                    <img id="par20NE" class="elemMenu" src="../img/esq20NE.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="par20SO" class="elemMenu" src="../img/esq20SO.png" onmousedown="return false;" />
+                    <img id="par20SE" class="elemMenu" src="../img/esq20SE.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="esqOC" class="elemMenu" src="../img/esqOC.png" onmousedown="return false;" />
+                    <img id="esqNC" class="elemMenu" src="../img/esqNC.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="esqEC" class="elemMenu" src="../img/esqEC.png" onmousedown="return false;" />
+                    <img id="esqSC" class="elemMenu" src="../img/esqSC.png" onmousedown="return false;" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="esqCC" class="elemMenu" src="../img/esqCC.png" onmousedown="return false;" />
+                    <img id="borra" class="elemMenu" src="../img/borrar.png" onmousedown="return false;" />
+                </div>
+            </div>
+            <div id="mapa">
+            </div>        
+            <div id="opciones">
+                <div id="filaOpciones">
+                	<img id="ojo" class="opcion" src="../img/ojo.png" onmousedown="return false;" />
+                </div>
+                <div id="filaOpciones">
+                	<img id="papelera" class="opcion" src="../img/papelera.png" onmousedown="return false;" />
+                </div>
+                <div id="filaOpciones">
+                    <p>Columnas</p>
+                    <img id="ponCol" class="opcion" src="../img/mas.png" onmousedown="return false;" />
+                    <img id="quitaCol" class="opcion" src="../img/menos.png" onmousedown="return false;" />
+                </div>
+                <div id="filaOpciones">
+                    <p>Filas</p>
+                    <img id="ponFila" class="opcion" src="../img/mas.png" onmousedown="return false;" />
+                    <img id="quitaFila" class="opcion" src="../img/menos.png" onmousedown="return false;" />
+                </div>
+                <div id="filaOpciones">
+                    <p>Nombre:</p>
+                    <input id="nombre" type="text" maxlength="20">
+                </div>
+                <div id="guardar" onClick="verificaGuarda()" ><p>Guardar</p></div>
+            </div>
+        </div>
+     		<div>
+       	<a href="pacmanUsrs.html">
+        		<p id="mapasUsuarios">mapas de usuarios</p>
+       		</div>
+       	</a>
+        <canvas id="canvas" style="display: none;"></canvas>
+        
+        <!--Popups-->
+        <div class="popup" style="display: none;"></div>
+        <div id="confirma" class="popupVentana" style="display: none;">
+            <p id="popupMsg"></p>
+            <input id="popupNombre" type="text" maxlength="20" style="display: none;">
+            <button id="popupBtnYes" class="popupBtn" onClick="verificaGuarda()" style="display: none;">
+                <p id="popupBtnYesMsg"></p>
+            </button>
+            <button id="popupBtnGo" class="popupBtn" onClick="document.location.href = '../php/vistas/pacmanUsrs.php'" style="display: none;">
+                <p id="popupBtnGoMsg"></p>
+            </button>
+            <button id="popupBtnNo" class="popupBtn" onClick="quitaPopup('confirma')">
+                <p id="popupBtnNoMsg"></p>
+            </button>
+        </div>
+        <script type="text/javascript" src="editor.js"></script>
+    </body>
+</html>
+
+
