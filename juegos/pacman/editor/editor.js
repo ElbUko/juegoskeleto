@@ -44,7 +44,8 @@ var vg = {
 		menu : 		document.getElementById('menu'),
 		mapa : 		document.getElementById('mapa'),
 		opciones : 	document.getElementById('opciones'),
-		menuSel : 	document.getElementById('pacmanE1'),
+		pacman : 	document.getElementById('pacman'),
+		menuSel : 	document.getElementById('pacman'),
 		ponCol : 	document.getElementById('ponCol'),
 		quitaCol : 	document.getElementById('quitaCol'),
 		ponFila : 	document.getElementById('ponFila'),
@@ -59,20 +60,34 @@ document.addEventListener('mouseup',	rSuelta);
 
 
 //NGC
-function esClaseMenu(className){
-	return className == vg.tipoElem.menu || className == vg.tipoElem.menuSel;
+function esClaseMenu(elemDom){
+	return elemDom.className == vg.tipoElem.menu 
+		|| elemDom.className == vg.tipoElem.menuSel;
 }
-function esClaseMapa(className){
-	return className == vg.tipoElem.mapa || className == vg.tipoElem.mapaImg;
+function esClaseMapa(elemDom){
+	return elemDom.className == vg.tipoElem.mapa 
+		|| elemDom.className == vg.tipoElem.mapaImg;
 }
-function esClaseOpcion(className){
-	return className == vg.tipoElem.opcion;
+function esClaseOpcion(elemDom){
+	return elemDom.className == vg.tipoElem.opcion;
 }
-function esMenuSel(idElem){
-	return idElem == vg.elemDom.menuSel.id;
+function tieneImagen(elemDom){
+	return elemDom.tagName == 'IMG';
 }
-function esOjo(idElem){
-	return idElem == vg.opc.ojo;
+function hayMenuSel(){
+	return vg.elemDom.menuSel.id != '';
+}
+function esOjo(elemDom){
+	return elemDom.id == vg.opc.ojo;
+}
+function esPacmanSel(){
+	return vg.elemDom.menuSel.id == 'pacman';
+}
+function estaBorrando(){
+	return vg.elemDom.menuSel.id == 'borra';
+}
+function esImagenPacman(img){
+	return vg.elemDom.pacman.src == img.src;
 }
 
 
@@ -80,34 +95,39 @@ function esOjo(idElem){
                      CONTROL DE EVENTOS
 #########################################################################################*/
 //EVT
-function rPincha(event){
-	var donde = event.target.className;
-    if (esClaseMenu(donde)) {
-    	cambiaSeleccionMenu(event.target);
-    } else if (esClaseOpcion(donde)){
-    	ejecutaOpcion(event.target.id);
-    } else if (esClaseMapa(donde) && vg.flags.pinchao && vg.flags.puesto) {
-        cambiaElementoMapa(event);
+function rPincha(evt){
+	var t = evt.target;  
+    if (esClaseMenu(t) && vg.elemDom.menuSel.id != '') {
+    	cambiaSeleccionMenu(t);
+    } 
+    else if (esClaseMenu(t) && vg.elemDom.menuSel.id == '') {
+    	SeleccionaMenu(t);
+    } 
+    else if (esClaseOpcion(t)){
+    	ejecutaOpcion(t.id);
+    } 
+    else if (esClaseMapa(t) && !vg.flags.pinchao && !vg.flags.puesto) {
+        cambiaElementoMapa(evt.target);
     }
-    vg.evt.pinchao = true;
+    vg.flags.pinchao = true;
 }
 function rSuelta(){
 	vg.flags.pinchao = false;
 	vg.flags.puesto = false;
 };
-function rEntra(event){
-	if (esOjo(event.target.id)){
+function rEntra(evt){
+	if (esOjo(evt.target)){
 		ponMapaBonito();
 	}
-    if (esClaseMapa(event.target.className) && vg.flags.pinchao && !vg.flags.puesto) {
-    	cambiaElementoMapa(event);
+    if (esClaseMapa(evt.target) && vg.flags.pinchao && !vg.flags.puesto) {
+    	cambiaElementoMapa(evt.target);
     }
     vg.flags.entrao = true;
 }
-function rSale(event){
+function rSale(evt){
     vg.flags.entrao = false;
     vg.flags.puesto = false;
-    if (esOjo(event.target.id)){
+    if (esOjo(evt.target)){
     	quitaMapaBonito();
     }
 }
@@ -117,10 +137,18 @@ function rSale(event){
                      CONTROL GENERAL
 #########################################################################################*/
 
-function cambiaSeleccionMenu(cual){
+function cambiaSeleccionMenu(elemDom){
 	desmarcaMenu(vg.elemDom.menuSel);
-	vg.elemDom.menuSel = cual;
-    marcaMenu(vg.elemDom.menuSel);
+	vg.elemDom.menuSel = elemDom;
+	marcaMenu(vg.elemDom.menuSel);
+}
+function SeleccionaMenu(elemDom){
+	vg.elemDom.menuSel = elemDom;
+	marcaMenu(vg.elemDom.menuSel);
+}
+function DeseleccionaMenu(){
+	desmarcaMenu(vg.elemDom.menuSel);
+	vg.elemDom.menuSel = {id:''};
 }
 function ejecutaOpcion(id){
 	if (id == vg.opc.papelera){
@@ -173,70 +201,32 @@ function controlaQuitaCol(){
 	}
 }
 
-function cambiaElementoMapa(evt){
-	
+function cambiaElementoMapa(casilla){
+	if (hayMenuSel()) {
+		var cuadroClic = casilla;
+		if (tieneImagen(casilla)){
+			if (esImagenPacman(casilla)){
+				habilita(pacman);				
+			}
+			casilla = casilla.parentNode;
+			casilla.removeChild(casilla.firstChild);
+		}
+		if (!estaBorrando() && !casilla.hasChildNodes()){
+			ponImagen(casilla);
+		}
+		if (esPacmanSel()){
+			deshabilita(vg.elemDom.menuSel)
+			DeseleccionaMenu();
+		}
+	}
 }
-
-//function clickao(event){
-//var clickao;
-////Para que si ya se ha bloqueao el poner cmabiando elMenuSel = "" no vuelva a liberar.
-//if (elMenuSel != ""){
-//  if ((event.target.className == 'elemMapa')||(event.target.className == 'elemMapaImg')) {    //Es del mapa
-//      var donde;
-//      if (event.target.tagName == 'IMG'){             //ya tiene imagen y la quitamos       
-//          clickao = event.target.parentNode.id;
-//          donde = event.target.parentNode;
-//          if (donde.hasChildNodes){
-//              cual = donde.firstChild.src;
-//              cual = 'img/' +cual.slice(cual.lastIndexOf('/')+1,cual.length);
-//              if (cual != elMenuSel){
-//                  if (cual == rutaImg+'pacmanE1.png'){
-//                      liberaMenu(cual);
-//                  }
-//                  donde.removeChild(donde.firstChild);   
-//              }
-//          }
-//      }
-//      else {
-//          donde = document.getElementById(clickao);
-//          clickao = event.target.id;
-//      }
-//      var elem = document.getElementById(elMenuSel);
-//      if (elMenuSel != rutaImg+'borrar.png'){
-//          pon(clickao);
-//      } 
-//      if (elMenuSel == rutaImg+'pacmanE1.png'){
-//          bloqueaMenu(elem);
-//      }
-//  }
-//}
-//}
-//function pon(clickao){
-//var donde = document.getElementById(clickao);
-//if (!donde.hasChildNodes()){
-//  var elem = document.createElement("img");
-//  elem.src = elMenuSel;
-//  elem.width = tMapa;
-//  elem.className = 'elemMapaImg';
-//  donde.appendChild(elem);
-//  puesto = true;
-//}
-//return;
-//}
-//function bloqueaMenu(elem){
-//elem.style.opacity = 0.3;
-//elem.style.backgroundColor = '#ddd';
-//elem.style.border = "4px solid #aaa";
-//antiguo = document.getElementById(elMenuSel);
-//pacmanPuesto = true;
-//elMenuSel = "";
-//}
-//function liberaMenu(cual){
-//var elem = document.getElementById(cual);
-//elem.style.opacity = 1;
-//elem.style.backgroundColor = '#000';
-//pacmanPuesto = false;
-//}
+function ponImagen(casilla){
+	var elem = document.createElement("img");
+	elem.src = vg.elemDom.menuSel.src;
+	elem.className = 'elemMapaImg';
+	casilla.appendChild(elem);
+	vg.flags.spuesto = true;
+}
 
 
 /*#######################################################################################
