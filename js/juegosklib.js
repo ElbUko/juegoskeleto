@@ -213,6 +213,80 @@ var Grid = function(wi, he){
 	};
 };
 
+class PuntoXYconVelocidad(){
+	var x;
+	var y;
+	var vx = 0;
+	var vy = 0;
+	var r = 0;
+	constructor(x, y){
+		this.x = x;
+		this.y = y;
+	};
+	constructor(x, y, vx, vy){
+		constructor(x, y);
+		this.vx = vx;
+		this.vy = vy;
+	};
+	constructor(x, y, vx, vy, r){
+		constructor(x, y, vx, vy);
+		this.r = r;
+	};
+	function avanzaEnX(){
+		this.x += this.vx;
+	}
+	function avanzaEnY(){
+		this.y += this.vy;
+	}
+	this.avanza(){
+		avanzaEnX();
+		avanzaEnY();
+	}
+	this.getX = function(){
+		return this.x;
+	}
+	this.setX = function(x){
+		this.x = x;
+	}
+	this.getY = function(){
+		return this.y;
+	}
+	this.setY = function(y){
+		this.y = y;
+	}
+	this.getR = function(){
+		return this.r;
+	}
+	this.setR = function(r){
+		this.r = r;
+	}
+	this.getVx = function(){
+		return this.vx;
+	}
+	this.setVx = function(vx){
+		this.vx = vx;
+	}
+	this.getVy = function(){
+		return this.vy;
+	}
+	this.setVy = function(vy){
+		this.vy = vy;
+	}
+}
+class GestorPuntosXY(){
+	var alto;
+	var ancho;
+	var puntos;
+	constructor(alto, ancho){
+		this.alto = alto;
+		this.ancho = ancho;
+		this.puntos = [];
+	}
+	this.addPunto = function(id, x, y){
+		puntos.push(new PuntoXYconVelocidad(x, y));
+	}
+}
+
 /*	Almacena en key el valor de la ultima pulsacion
  * Se codifica 0,1,2,3 para N,E,S,O respectivamente.
  * Tambien tiene un booleano para tecla pulsada
