@@ -24,7 +24,8 @@ var vg = {
 	flags : {
 		pinchao : 	false,
 		entrao : 	false,
-		puesto : 	false
+		puesto : 	false,
+		pacmanPuesto: false
 	},
 	opc : {
 		ojo : 		'ojo',
@@ -50,7 +51,13 @@ var vg = {
 		quitaCol : 	document.getElementById('quitaCol'),
 		ponFila : 	document.getElementById('ponFila'),
 		quitaFila :	document.getElementById('quitaFila'),
-		casillas : 	document.getElementsByClassName('elemMapa')
+		casillas : 	document.getElementsByClassName('elemMapa'),
+		cajatxtnombre : document.getElementById("nombre")
+	},
+	btn : {
+		si : 'popupBtnYes',
+		no : 'popupBtnNo',
+		go : 'popupBtnGo'
 	}
 };
 document.addEventListener('mouseover',	rEntra);
@@ -71,7 +78,7 @@ function esClaseMapa(elemDom){
 function esClaseOpcion(elemDom){
 	return elemDom.className == vg.tipoElem.opcion;
 }
-function tieneImagen(elemDom){
+function esImagen(elemDom){
 	return elemDom.tagName == 'IMG';
 }
 function hayMenuSel(){
@@ -97,16 +104,9 @@ function esImagenPacman(img){
 //EVT
 function rPincha(evt){
 	var t = evt.target;  
-    if (esClaseMenu(t) && vg.elemDom.menuSel.id != '') {
-    	cambiaSeleccionMenu(t);
-    } 
-    else if (esClaseMenu(t) && vg.elemDom.menuSel.id == '') {
-    	SeleccionaMenu(t);
-    } 
-    else if (esClaseOpcion(t)){
-    	ejecutaOpcion(t.id);
-    } 
-    else if (esClaseMapa(t) && !vg.flags.pinchao && !vg.flags.puesto) {
+    if (esClaseMenu(t)){
+    	accionMenuPinchado(t);
+    } else if (hayMenuSel() && esClaseMapa(t) && !vg.flags.pinchao && !vg.flags.puesto) {
         cambiaElementoMapa(evt.target);
     }
     vg.flags.pinchao = true;
@@ -116,53 +116,29 @@ function rSuelta(){
 	vg.flags.puesto = false;
 };
 function rEntra(evt){
-	if (esOjo(evt.target)){
-		ponMapaBonito();
-	}
-    if (esClaseMapa(evt.target) && vg.flags.pinchao && !vg.flags.puesto) {
+    if (hayMenuSel() && esClaseMapa(evt.target) && vg.flags.pinchao && !vg.flags.puesto) {
     	cambiaElementoMapa(evt.target);
     }
-    vg.flags.entrao = true;
 }
 function rSale(evt){
-    vg.flags.entrao = false;
     vg.flags.puesto = false;
-    if (esOjo(evt.target)){
-    	quitaMapaBonito();
-    }
 }
 
 
 /*#######################################################################################
-                     CONTROL GENERAL
+                     CONTROL DE VARIABLES
 #########################################################################################*/
 
-function cambiaSeleccionMenu(elemDom){
-	desmarcaMenu(vg.elemDom.menuSel);
-	vg.elemDom.menuSel = elemDom;
-	marcaMenu(vg.elemDom.menuSel);
-}
-function SeleccionaMenu(elemDom){
-	vg.elemDom.menuSel = elemDom;
-	marcaMenu(vg.elemDom.menuSel);
+function accionMenuPinchado(target){
+	if (hayMenuSel()) {
+		desmarcaMenuSel();
+	}
+	vg.elemDom.menuSel = target;
+	marcaMenuSel();
 }
 function DeseleccionaMenu(){
-	desmarcaMenu(vg.elemDom.menuSel);
+	desmarcaMenuSel();
 	vg.elemDom.menuSel = {id:''};
-}
-function ejecutaOpcion(id){
-	if (id == vg.opc.papelera){
-		ponPopup('seguro');
-		borraMapa();
-	} else if (id == vg.opc.ponCol){
-		controlaPonCol();
-	} else if (id == vg.opc.quitaCol){
-		controlaQuitaCol();
-	} else if (id == vg.opc.ponFila){
-		controlaPonFila();
-	} else if (id == vg.opc.quitaFila){
-		controlaQuitaFila();
-	}
 }
 function controlaPonFila(){
 	habilita(vg.elemDom.quitaFila);
@@ -201,36 +177,31 @@ function controlaQuitaCol(){
 	}
 }
 
-function cambiaElementoMapa(casilla){
-	if (hayMenuSel()) {
-		var cuadroClic = casilla;
-		if (tieneImagen(casilla)){
-			if (esImagenPacman(casilla)){
-				habilita(pacman);				
-			}
-			casilla = casilla.parentNode;
-			casilla.removeChild(casilla.firstChild);
+function cambiaElementoMapa(target){
+	var casilla;
+	if (esImagen(target)){
+		if (esImagenPacman(target)){
+			habilita(pacman);
+			vg.flags.pacmanPuesto = false;
 		}
-		if (!estaBorrando() && !casilla.hasChildNodes()){
-			ponImagen(casilla);
-		}
-		if (esPacmanSel()){
-			deshabilita(vg.elemDom.menuSel)
-			DeseleccionaMenu();
-		}
+		casilla = target.parentNode;
+		quitaImagen(casilla);
+	} else {
+		casilla = target;
 	}
-}
-function ponImagen(casilla){
-	var elem = document.createElement("img");
-	elem.src = vg.elemDom.menuSel.src;
-	elem.className = 'elemMapaImg';
-	casilla.appendChild(elem);
-	vg.flags.spuesto = true;
+	if (!estaBorrando() && !casilla.hasChildNodes()){
+		ponImagen(casilla);
+	}
+	if (esPacmanSel()){
+		deshabilita(vg.elemDom.menuSel)
+		DeseleccionaMenu();
+		vg.flags.pacmanPuesto = true;
+	}
 }
 
 
 /*#######################################################################################
-                     TRANSFORMACIONES CSS
+                     ALTERACIONES AL CSS
 #########################################################################################*/
 //CSS
 function deshabilita(htmlElem){
@@ -239,13 +210,13 @@ function deshabilita(htmlElem){
 function habilita(htmlElem){
 	htmlElem.classList.remove(vg.tipoElem.deshab);	
 }
-function marcaMenu(opcion){
-	opcion.classList.remove(vg.tipoElem.menu);
-	opcion.classList.add(vg.tipoElem.menuSel);
+function marcaMenuSel(){
+	vg.elemDom.menuSel.classList.remove(vg.tipoElem.menu);
+	vg.elemDom.menuSel.classList.add(vg.tipoElem.menuSel);
 }
-function desmarcaMenu(opcion){
-	opcion.classList.remove(vg.tipoElem.menuSel);
-	opcion.classList.add(vg.tipoElem.menu);
+function desmarcaMenuSel(){
+	vg.elemDom.menuSel.classList.remove(vg.tipoElem.menuSel);
+	vg.elemDom.menuSel.classList.add(vg.tipoElem.menu);
 }
 function ponMapaBonito(){
 	for (var i=0; i<vg.elemDom.casillas.length; i++){
@@ -263,6 +234,17 @@ function quitaMapaBonito(){
                      ALTERACIONES AL DOM
 #########################################################################################*/
 //DOM
+function ponImagen(casilla){
+	var elem = document.createElement("img");
+	elem.src = vg.elemDom.menuSel.src;
+	elem.className = 'elemMapaImg';
+	elem.onmousedown = function(){return false};
+	casilla.appendChild(elem);
+	vg.flags.spuesto = true;
+}
+function quitaImagen(casilla){
+	casilla.removeChild(casilla.firstChild);
+}
 function borraMapa(){
 	for (var i=0; i<vg.elemDom.casillas.length; i++){
 		var hijo = vg.elemDom.casillas[i].firstChild;
@@ -275,6 +257,10 @@ function creaMapa(){
 	vg.dim.cols = vg.dim.colsIni;
     for (let i=0; i<vg.dim.filasIni; i++) {
     	ponFila();
+	}
+	var imgs = document.getElementsByTagName('img');
+	for(let i=0; i<imgs.length; i++){
+		imgs[i].onmousedown = function(){return false};
 	}
 }
 function ponFila(){
@@ -314,6 +300,100 @@ function quitaColumna(){
 }
 
 
+
+/*#######################################################################################
+                    POPUP
+#########################################################################################*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function ponPopup(cual){
+	var popupBtnYesDisplay = false;
+	var fondoPopup = document.getElementsByClassName("popup")[0];
+	var popup = document.getElementById("confirma");
+	var popupMsg = document.getElementById("popupMsg");
+	var popupInput = document.getElementById("popupInput");
+	var popupBtnYes = document.getElementById("popupBtnYes");
+	var popupBtnNoMsg = document.getElementById("popupBtnNoMsg");
+	var popupBtnYesMsg = document.getElementById("popupBtnYesMsg");
+	switch (cual){      //cual es un problema. Si no lo hay en default casco el "Ha ido bien!"
+		case "noPacman": {
+			popupMsg.innerHTML = "¡¿Es que quieres jugar sin prota?!<br />Vete a ver la tele!";
+			popupBtnYes.style.display = "none";
+			popupInput.style.display = "none";
+			popupBtnNoMsg.innerHTML = "Va, pongo uno.";
+			break;
+		}
+		case "noNombre": {
+			popupMsg.innerHTML = "Has hecho algo, por eso de nombrarlo... nombre?";
+			popupBtnYes.style.display = "inline";
+			popupInput.style.display = "block";
+			popupBtnYesMsg.innerHTML = "Guardar";
+			popupBtnNoMsg.innerHTML = "Cancelar";
+			break;
+		}
+		case "borra": {
+			popupMsg.innerHTML = "¿Seguro que quieres limpiar el mapa?";
+			popupBtnYes.style.display = "inline";
+			popupBtnYesMsg.innerHTML = "Si";
+			popupBtnNoMsg.innerHTML = "No";
+			break;
+		}
+		case "noComida": {
+			popupMsg.innerHTML = "Si no pones al menos una bolita...<br /> ¡el juego no acaba!";
+			popupBtnYes.style.display = "none";
+			popupInput.style.display = "none";
+			popupBtnNoMsg.innerHTML = "Venga va, pongo alguna";
+			break;
+		}
+		default: {
+			popupMsg.innerHTML = "Guardado! Quieres probarlo? Dale a mapas de usuarios.";
+			popupBtnYes.style.display = "none";
+			popupBtnGoMsg.innerHTML = "Mapas de usuarios";
+			popupBtnGo.style.display = "inline-block";
+			popupBtnNoMsg.innerHTML = "Dejame aqui otro ratito";
+			popupInput.style.display = "none";
+		} 
+	}
+fondoPopup.style.display = 'block';
+popup.style.display = 'block';
+}
+
+function quitaPopup(cual){
+	var fondoPopup = document.getElementsByClassName("popup")[0];
+	var popup = document.getElementById(cual);
+	fondoPopup.style.display = 'none';
+	popup.style.display = 'none';
+	var cajatxtnombre = document.getElementById("nombre");
+	var cajatxtnombrepop = document.getElementById("popupInput");
+	if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
+		cajatxtnombre.value = cajatxtnombrepop.value;
+	}
+}
 creaMapa();
 
 
@@ -327,135 +407,61 @@ creaMapa();
 
 
 
-//         /*#######################################################################################
-//                             FUNCIONES PRINCIPALES
-//         #########################################################################################*/                    
-//         //VARIABLES GLOBALES IMPORTANTES:
-// //            elMenuSel:      almacena que elemento del menu está seleccionado (ej: /img/pacmanE1.png)
 
 
 
-//                     //
+/*#######################################################################################
+                    POPUP
+#########################################################################################*/
+function verificaGuarda(){
+	var todoBien = true;
+	var mensaje = null;
+	if (!vg.flags.pacmanPuesto){
+        todoBien = false;
+        cual = "noPacman";
+    }
+    //comprobar que al menos hay una de comida
+    var hayComida = false,
+        filas = mapa.childNodes,
+        divs, direcc;
+    for (var i=0; i<filas.length; i++){
+        divs = filas[i].childNodes;
+        for (var j=0; j<divs.length; j++){
+            if (divs[j].firstChild != null){
+                direcc = divs[j].firstChild.src;
+                if (direcc.slice(direcc.lastIndexOf('/')+1,direcc.length) == 'bola.png'){
+                    hayComida = true;
+                }
+            }
+        }
+    }
+    if (todoBien && !hayComida){
+        todoBien = false;
+        cual = "noComida";
+    }
+    //comprobar si ha puesto nombre
+    var cajatxtnombrepop = document.getElementById("popupInput");
+    if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
+        cajatxtnombre.value = cajatxtnombrepop.value;
+    }
+    if (todoBien && (cajatxtnombre.value == "" || cajatxtnombre.value == undefined)){
+        todoBien = false;
+        cual = "noNombre";
+    }
+    //comprobar si ya existe el nombre
+    //comprobar si ya existe la pantalla
+    if (todoBien){
+        todoBien = guardaMapa();
+    }
+    else {
+         ponPopup(cual);
+    }
+}
 
 
 
 
-
-//         /*#######################################################################################
-//                             POPUP
-//         #########################################################################################*/
-//         function verificaGuarda(){
-//             var todoBien = true;
-//             var mensaje = null;
-//             //comprobar si hay pacman
-//             if (!pacmanPuesto){
-//                 todoBien = false;
-//                 cual = "noPacman";
-//             }
-//             //comprobar que al menos hay una de comida
-//             var hayComida = false,
-//                 filas = mapa.childNodes,
-//                 divs, direcc;
-//             for (var i=0; i<filas.length; i++){
-//                 divs = filas[i].childNodes;
-//                 for (var j=0; j<divs.length; j++){
-//                     if (divs[j].firstChild != null){
-//                         direcc = divs[j].firstChild.src;
-//                         if (direcc.slice(direcc.lastIndexOf('/')+1,direcc.length) == 'bola.png'){
-//                             hayComida = true;
-//                         }
-//                     }
-//                 }
-//             }
-//             if (todoBien && !hayComida){
-//                 todoBien = false;
-//                 cual = "noComida";
-//             }
-//             //comprobar si ha puesto nombre
-//             var cajatxtnombrepop = document.getElementById("popupNombre");
-//             if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
-//                 cajatxtnombre.value = cajatxtnombrepop.value;
-//             }
-//             if (todoBien && (cajatxtnombre.value == "" || cajatxtnombre.value == undefined)){
-//                 todoBien = false;
-//                 cual = "noNombre";
-//             }
-//             //comprobar si ya existe el nombre
-//             //comprobar si ya existe la pantalla
-//             if (todoBien){
-//                 todoBien = guardaMapa();
-//             }
-//             else {
-//                  ponPopup(cual);
-//             }
-//         }
-
-
-//         function ponPopup(cual){
-//             var popupBtnYesDisplay = false;
-//             var fondoPopup = document.getElementsByClassName("popup")[0];
-//             var popup = document.getElementById("confirma");
-//             var popupMsg = document.getElementById("popupMsg");
-//             var popupNombre = document.getElementById("popupNombre");
-//             var popupBtnYes = document.getElementById("popupBtnYes");
-//             var popupBtnNoMsg = document.getElementById("popupBtnNoMsg");
-//             var popupBtnYesMsg = document.getElementById("popupBtnYesMsg");
-//             switch (cual){      //cual es un problema. Si no lo hay en default casco el "Ha ido bien!"
-//                 case "noPacman": {
-//                     popupMsg.innerHTML = "¡¿Es que quieres jugar sin prota?!<br />Vete a ver la tele!";
-//                     popupBtnYes.style.display = "none";
-//                     popupNombre.style.display = "none";
-//                     popupBtnNoMsg.innerHTML = "Va, pongo uno.";
-//                     break;
-//                 }
-//                 case "noNombre": {
-//                     popupMsg.innerHTML = "Has hecho algo, por eso de nombrarlo... nombre?";
-//                     popupBtnYes.style.display = "inline";
-//                     popupNombre.style.display = "block";
-//                     popupBtnYesMsg.innerHTML = "Guardar";
-//                     popupBtnNoMsg.innerHTML = "Cancelar";
-//                     break;
-//                 }
-//                 case "noComida": {
-//                     popupMsg.innerHTML = "Si no pones al menos una bolita...<br /> ¡el juego no acaba!";
-//                     popupBtnYes.style.display = "none";
-//                     popupNombre.style.display = "none";
-//                     popupBtnNoMsg.innerHTML = "Venga va, pongo alguna";
-//                     break;
-//                 }
-//                 default: {
-//                     popupMsg.innerHTML = "Guardado! Quieres probarlo? Dale a mapas de usuarios.";
-//                     popupBtnYes.style.display = "none";
-//                     popupBtnGoMsg.innerHTML = "Mapas de usuarios";
-//                     popupBtnGo.style.display = "inline-block";
-//                     popupBtnNoMsg.innerHTML = "Dejame aqui otro ratito";
-//                     popupNombre.style.display = "none";
-//                 } 
-//             }
-//             fondoPopup.style.display = 'block';
-//             popup.style.display = 'block';
-//         }
-
-//         function quitaPopup(cual){
-//             var fondoPopup = document.getElementsByClassName("popup")[0];
-//             var popup = document.getElementById(cual);
-//             fondoPopup.style.display = 'none';
-//             popup.style.display = 'none';
-//             var cajatxtnombre = document.getElementById("nombre");
-//             var cajatxtnombrepop = document.getElementById("popupNombre");
-//             if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
-//                 cajatxtnombre.value = cajatxtnombrepop.value;
-//             }
-//         }
-
-//         //eventos
-//                     document.addEventListener('mouseover',rEntra);
-//                     document.addEventListener('mouseout',rSale);
-//                     document.addEventListener('mousedown',rPincha);
-//                     document.addEventListener('mouseup',rSuelta);
 //                     var rutaImg = 'img/';
-//                     var menu = document.getElementById("menu");
-//                     var mapa = document.getElementById("mapa");
 //                     var cajatxtnombre = document.getElementById("nombre");
 //                     var pinchao = false,
 //                         entrao = false,
