@@ -54,12 +54,18 @@ var vg = {
 		casillas : 	document.getElementsByClassName('elemMapa'),
 		cajatxtnombre : document.getElementById("nombre")
 	},
-	btn : {
-		si : 'popupBtnYes',
-		no : 'popupBtnNo',
-		go : 'popupBtnGo'
+	pop : {
+		cual : {
+			borra : 'borra',
+		},
+		btn : {
+			si : 'popupBtnYes',
+			no : 'popupBtnNo',
+			go : 'popupBtnGo'
+		}
 	}
 };
+
 document.addEventListener('mouseover',	rEntra);
 document.addEventListener('mouseout',	rSale);
 document.addEventListener('mousedown',	rPincha);
@@ -305,6 +311,9 @@ function quitaColumna(){
                     POPUP
 #########################################################################################*/
 
+function ponPopup(cual){
+
+}
 
 
 
@@ -327,8 +336,42 @@ function quitaColumna(){
 
 
 
-
-
+var popup = {
+	msg : '',
+	noMsg : 'No',
+	input : false,
+	si : false,
+	no : false,
+	go : false,
+	elemDom : {
+		fondoPopup : document.getElementsByClassName("popup")[0],
+		popup : document.getElementById("confirma"),
+		popupMsg : document.getElementById("popupMsg"),
+		popupInput : document.getElementById("popupInput"),
+		popupBtnYes : document.getElementById("popupBtnYes"),
+		popupBtnNo : document.getElementById("popupBtnNo"),
+		popupBtnGo : document.getElementById("popupBtnGo"),
+		popupBtnNoMsg : document.getElementById("popupBtnNoMsg")		
+	},
+	carga : function(){
+		this.elemDom.popupMsg.innerHTML = this.msg;
+		this.elemDom.popupInput.style.display = this.input ? 'block' : 'none';
+		this.elemDom.popupBtnYes.style.display = this.si ? 'block' : 'none';
+		this.elemDom.popupBtnNo.style.display = this.no ? 'block' : 'none';
+		this.elemDom.popupBtnGo.style.display = this.go ? 'block' : 'none';
+		this.elemDom.popupBtnNoMsg.innerHTML = this.noMsg;
+	},
+	pon : function() {
+		this.elemDom.fondoPopup.style.display = 'block';
+		this.elemDom.popup.style.display = 'block';
+	}, 
+	quita : function(){
+		this.elemDom.fondoPopup.style.display = 'none';
+		this.elemDom.popup.style.display = 'none';
+	} 
+	// bean pa configurar popup
+	//ponle un par de metodos pinta y quitaFila
+}
 
 
 function ponPopup(cual){
