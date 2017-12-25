@@ -45,14 +45,14 @@ var vg = {
 		menu : 		document.getElementById('menu'),
 		mapa : 		document.getElementById('mapa'),
 		opciones : 	document.getElementById('opciones'),
+		nombre : 	document.getElementById('nombre'),
 		pacman : 	document.getElementById('pacman'),
 		menuSel : 	document.getElementById('pacman'),
 		ponCol : 	document.getElementById('ponCol'),
 		quitaCol : 	document.getElementById('quitaCol'),
 		ponFila : 	document.getElementById('ponFila'),
 		quitaFila :	document.getElementById('quitaFila'),
-		casillas : 	document.getElementsByClassName('elemMapa'),
-		cajatxtnombre : document.getElementById("nombre")
+		casillas : 	document.getElementsByClassName('elemMapa')
 	}
 };
 
@@ -91,6 +91,15 @@ function estaBorrando(){
 }
 function esImagenPacman(img){
 	return vg.elemDom.pacman.src == img.src;
+}
+function noHayPacman(){
+	return !vg.flags.pacmanPuesto;	
+}
+function tieneBola(div){
+	return div.src.indexOf('bola.png') != -1
+}
+function noHayNombre(){
+	return vg.elemDom.nombre.value.trim() == '';
 }
 
 
@@ -195,6 +204,35 @@ function cambiaElementoMapa(target){
 	}
 }
 
+function verificaGuarda(){
+	if (noHayPacman()){
+		ponPopup('noPacman');
+	}
+	else if (noHayBolita()){
+		ponPopup('noComida');
+	}
+	else if (noHayNombre()){
+		ponPopup('noNombre');
+	}
+	else {
+		guardaMapa();
+	}
+		//TODO comprobar si existe el nombre o la pantalla
+}
+
+
+function noHayBolita(){
+	var filas = vg.elemDom.mapa.childNodes;
+	for (var i=0; i<filas.length; i++){
+		divs = filas[i].childNodes;
+		for (var j=0; j<divs.length; j++){
+			if (divs[j].firstChild != null && tieneBola(divs[j].firstChild)) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
 
 /*#######################################################################################
                      ALTERACIONES AL CSS
@@ -336,7 +374,6 @@ var popup = {
 		this.elemDom.popupBtnNo.style.display = this.no ? 'inline-block' : 'none';
 		this.elemDom.popupBtnNoMsg.innerHTML = this.noMsg;
 		this.elemDom.popupBtnYesMsg.innerHTML = this.siMsg;
-		this.limpia();
 	},
 	pon : function() {
 		this.elemDom.fondoPopup.style.display = 'block';
@@ -377,10 +414,11 @@ function ponPopup(cual){
 }
 function popupClick(btn){
 	if (popup.tipo == 'noNombre'){
-		var cajatxtnombre = document.getElementById("nombre");
 		var cajatxtnombrepop = document.getElementById("popupInput");
-		if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
-			cajatxtnombre.value = cajatxtnombrepop.value;
+		if (cajatxtnombrepop.style.display != "none" && cajatxtnombrepop.value != "") {
+			vg.elemDom.nombre.value = cajatxtnombrepop.value.trim();
+		} else {
+			vg.elemDom.nombre.value = 'Sin nombre';
 		}
 	}
 	if (btn == 'popupBtnYes'){
@@ -389,76 +427,69 @@ function popupClick(btn){
 		}
 	} 
 	popup.quita();
+	popup.limpia();
 }
 
 creaMapa();
 
 
-//         var antiguo, actual;
-//         var esFantasma, esPacman;
-//         var pacmanPuesto = false;
-//         var rutaImg = 'img/';
-//         var esEdicion = false;
-//         var id = null;
 
 
+function guardaMapa(){
 
 
-
-
-
-/*#######################################################################################
-                    POPUP
-#########################################################################################*/
-function verificaGuarda(){
-	var todoBien = true;
-	var mensaje = null;
-	if (!vg.flags.pacmanPuesto){
-        todoBien = false;
-        cual = "noPacman";
-    }
-    //comprobar que al menos hay una de comida
-    var hayComida = false,
-        filas = mapa.childNodes,
-        divs, direcc;
-    for (var i=0; i<filas.length; i++){
-        divs = filas[i].childNodes;
-        for (var j=0; j<divs.length; j++){
-            if (divs[j].firstChild != null){
-                direcc = divs[j].firstChild.src;
-                if (direcc.slice(direcc.lastIndexOf('/')+1,direcc.length) == 'bola.png'){
-                    hayComida = true;
-                }
-            }
-        }
-    }
-    if (todoBien && !hayComida){
-        todoBien = false;
-        cual = "noComida";
-    }
-    //comprobar si ha puesto nombre
-    var cajatxtnombrepop = document.getElementById("popupInput");
-    if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
-        cajatxtnombre.value = cajatxtnombrepop.value;
-    }
-    if (todoBien && (cajatxtnombre.value == "" || cajatxtnombre.value == undefined)){
-        todoBien = false;
-        cual = "noNombre";
-    }
-    //comprobar si ya existe el nombre
-    //comprobar si ya existe la pantalla
-    if (todoBien){
-        todoBien = guardaMapa();
-    }
-    else {
-         ponPopup(cual);
-    }
+	var nombre = cajatxtnombre.value;
+	var tmn = 10;
+	var canvas = document.getElementById("canvas");
+	canvas.height = nFilas*tmn;
+	canvas.width = nColumn*tmn;
+	var ctx = canvas.getContext("2d");
+	ctx.fillRect(0,0,canvas.width, canvas.height);
+	//Construyo la matriz para guardar la info en el js
+	var filas, divs, imgs = [], cadena = '', direcc, val, pos;
+	filas = mapa.childNodes;
+	imgs = menu.childNodes;
+	for (var i=0; i<filas.length; i++){
+		divs = filas[i].childNodes;
+		//cadena += '[';                      //cada fila es nuevo vector
+		for (var j=0; j<divs.length; j++){
+			if (divs[j].firstChild != null){
+				direcc = divs[j].firstChild.src;
+				nombreImg = direcc.slice(direcc.lastIndexOf('/')+1,direcc.length);
+				//[val, pos] = sacaImagen(nombreImg)     NO TIRA en CHROME
+				cosa = sacaImagen(nombreImg);
+				val = cosa[0];
+				pos = cosa[1];
+				cadena += val;
+				ctx.drawImage(imgs[Math.floor(pos/2)].childNodes[pos%2],j*tmn,i*tmn,tmn,tmn);
+			}
+			else {
+				cadena += 'x';
+			}
+		}
+		//cadena += '],'                      //cerramos el vector
+	}
+	//lo mando con ajax
+	var img    = canvas.toDataURL("image/png");
+	ajax.open('POST', "../php/control/pacmanGuardaMapa.php", true);
+	ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	console.log("¿es edicion? "+esEdicion);
+	if (esEdicion){
+		var envia = "acc=edi&id="+id+"&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&nombreV="+nombreViejo+"&filas="+nFilas+"&columnas="+nColumn;	
+	}
+	else {
+		var envia = "acc=cre&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&filas="+nFilas+"&columnas="+nColumn;
+	}
+	ajax.send(envia);
+	var boton = document.getElementById("guardar");
+	boton.disabled = true;
+	//console.log(cadena);
 }
 
 
 
 
-//                     var rutaImg = 'img/';
+//        var rutaImg = 'img/';
 //                     var cajatxtnombre = document.getElementById("nombre");
 //                     var pinchao = false,
 //                         entrao = false,
@@ -525,56 +556,6 @@ function verificaGuarda(){
 //                     }
 
 
-//                     function guardaMapa(){
-//                         var nombre = cajatxtnombre.value;
-//                         var tmn = 10;
-//                         var canvas = document.getElementById("canvas");
-//                         canvas.height = nFilas*tmn;
-//                         canvas.width = nColumn*tmn;
-//                         var ctx = canvas.getContext("2d");
-//                         ctx.fillRect(0,0,canvas.width, canvas.height);
-//                         //Construyo la matriz para guardar la info en el js
-//                         var filas, divs, imgs = [], cadena = '', direcc, val, pos;
-//                         filas = mapa.childNodes;
-//                         imgs = menu.childNodes;
-//                         for (var i=0; i<filas.length; i++){
-//                             divs = filas[i].childNodes;
-//                             //cadena += '[';                      //cada fila es nuevo vector
-//                             for (var j=0; j<divs.length; j++){
-//                                 if (divs[j].firstChild != null){
-//                                     direcc = divs[j].firstChild.src;
-//                                     nombreImg = direcc.slice(direcc.lastIndexOf('/')+1,direcc.length);
-//                                     //[val, pos] = sacaImagen(nombreImg)     NO TIRA en CHROME
-//                                     cosa = sacaImagen(nombreImg);
-//                                     val = cosa[0];
-//                                     pos = cosa[1];
-//                                     cadena += val;
-//                                     ctx.drawImage(imgs[Math.floor(pos/2)].childNodes[pos%2],j*tmn,i*tmn,tmn,tmn);
-//                                 }
-//                                 else {
-//                                     cadena += 'x';
-//                                 }
-//                             }
-//                             //cadena += '],'                      //cerramos el vector
-//                         }
-//                         //lo mando con ajax
-//                         var img    = canvas.toDataURL("image/png");
-//         			    ajax.open('POST', "../php/control/pacmanGuardaMapa.php", true);
-//         			    ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-//         			    console.log("¿es edicion? "+esEdicion);
-//         			    if (esEdicion){
-//         			    	var envia = "acc=edi&id="+id+"&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&nombreV="+nombreViejo+"&filas="+nFilas+"&columnas="+nColumn;	
-//         		    	}
-//         		    	else {
-//         		    		var envia = "acc=cre&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&filas="+nFilas+"&columnas="+nColumn;
-//         			    }
-//         			    ajax.send(envia);
-        			
-//         			    var boton = document.getElementById("guardar");
-//         			    boton.disabled = true;
-//         			    //console.log(cadena);
-                        
-//                     }
                     
 
 
