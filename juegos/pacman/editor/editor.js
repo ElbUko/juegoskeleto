@@ -53,16 +53,6 @@ var vg = {
 		quitaFila :	document.getElementById('quitaFila'),
 		casillas : 	document.getElementsByClassName('elemMapa'),
 		cajatxtnombre : document.getElementById("nombre")
-	},
-	pop : {
-		cual : {
-			borra : 'borra',
-		},
-		btn : {
-			si : 'popupBtnYes',
-			no : 'popupBtnNo',
-			go : 'popupBtnGo'
-		}
 	}
 };
 
@@ -187,7 +177,7 @@ function cambiaElementoMapa(target){
 	var casilla;
 	if (esImagen(target)){
 		if (esImagenPacman(target)){
-			habilita(pacman);
+			habilita(vg.elemDom.pacman);
 			vg.flags.pacmanPuesto = false;
 		}
 		casilla = target.parentNode;
@@ -258,6 +248,7 @@ function borraMapa(){
 			vg.elemDom.casillas[i].removeChild(hijo);
 		}
 	}
+	habilita(vg.elemDom.pacman);
 }
 function creaMapa(){
 	vg.dim.cols = vg.dim.colsIni;
@@ -311,38 +302,14 @@ function quitaColumna(){
                     POPUP
 #########################################################################################*/
 
-function ponPopup(cual){
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var popup = {
 	msg : '',
 	noMsg : 'No',
+	siMsg : 'Si',
 	input : false,
 	si : false,
-	no : false,
-	go : false,
+	no : true,
+	tipo : undefined,
 	elemDom : {
 		fondoPopup : document.getElementsByClassName("popup")[0],
 		popup : document.getElementById("confirma"),
@@ -350,16 +317,26 @@ var popup = {
 		popupInput : document.getElementById("popupInput"),
 		popupBtnYes : document.getElementById("popupBtnYes"),
 		popupBtnNo : document.getElementById("popupBtnNo"),
-		popupBtnGo : document.getElementById("popupBtnGo"),
-		popupBtnNoMsg : document.getElementById("popupBtnNoMsg")		
+		popupBtnNoMsg : document.getElementById("popupBtnNoMsg"),
+		popupBtnYesMsg : document.getElementById("popupBtnYesMsg")
 	},
-	carga : function(){
+	limpia : function(){
+		this.msg = '';
+		this.noMsg = 'No';
+		this.siMsg = 'Si';
+		this.input = false;
+		this.si = false;
+		this.no = true;
+		this.tipo = undefined;
+	},
+	carga : function() {
 		this.elemDom.popupMsg.innerHTML = this.msg;
 		this.elemDom.popupInput.style.display = this.input ? 'block' : 'none';
-		this.elemDom.popupBtnYes.style.display = this.si ? 'block' : 'none';
-		this.elemDom.popupBtnNo.style.display = this.no ? 'block' : 'none';
-		this.elemDom.popupBtnGo.style.display = this.go ? 'block' : 'none';
+		this.elemDom.popupBtnYes.style.display = this.si ? 'inline-block' : 'none';
+		this.elemDom.popupBtnNo.style.display = this.no ? 'inline-block' : 'none';
 		this.elemDom.popupBtnNoMsg.innerHTML = this.noMsg;
+		this.elemDom.popupBtnYesMsg.innerHTML = this.siMsg;
+		this.limpia();
 	},
 	pon : function() {
 		this.elemDom.fondoPopup.style.display = 'block';
@@ -368,75 +345,52 @@ var popup = {
 	quita : function(){
 		this.elemDom.fondoPopup.style.display = 'none';
 		this.elemDom.popup.style.display = 'none';
-	} 
-	// bean pa configurar popup
-	//ponle un par de metodos pinta y quitaFila
+	}
 }
-
 
 function ponPopup(cual){
-	var popupBtnYesDisplay = false;
-	var fondoPopup = document.getElementsByClassName("popup")[0];
-	var popup = document.getElementById("confirma");
-	var popupMsg = document.getElementById("popupMsg");
-	var popupInput = document.getElementById("popupInput");
-	var popupBtnYes = document.getElementById("popupBtnYes");
-	var popupBtnNoMsg = document.getElementById("popupBtnNoMsg");
-	var popupBtnYesMsg = document.getElementById("popupBtnYesMsg");
-	switch (cual){      //cual es un problema. Si no lo hay en default casco el "Ha ido bien!"
-		case "noPacman": {
-			popupMsg.innerHTML = "¡¿Es que quieres jugar sin prota?!<br />Vete a ver la tele!";
-			popupBtnYes.style.display = "none";
-			popupInput.style.display = "none";
-			popupBtnNoMsg.innerHTML = "Va, pongo uno.";
-			break;
-		}
-		case "noNombre": {
-			popupMsg.innerHTML = "Has hecho algo, por eso de nombrarlo... nombre?";
-			popupBtnYes.style.display = "inline";
-			popupInput.style.display = "block";
-			popupBtnYesMsg.innerHTML = "Guardar";
-			popupBtnNoMsg.innerHTML = "Cancelar";
-			break;
-		}
-		case "borra": {
-			popupMsg.innerHTML = "¿Seguro que quieres limpiar el mapa?";
-			popupBtnYes.style.display = "inline";
-			popupBtnYesMsg.innerHTML = "Si";
-			popupBtnNoMsg.innerHTML = "No";
-			break;
-		}
-		case "noComida": {
-			popupMsg.innerHTML = "Si no pones al menos una bolita...<br /> ¡el juego no acaba!";
-			popupBtnYes.style.display = "none";
-			popupInput.style.display = "none";
-			popupBtnNoMsg.innerHTML = "Venga va, pongo alguna";
-			break;
-		}
-		default: {
-			popupMsg.innerHTML = "Guardado! Quieres probarlo? Dale a mapas de usuarios.";
-			popupBtnYes.style.display = "none";
-			popupBtnGoMsg.innerHTML = "Mapas de usuarios";
-			popupBtnGo.style.display = "inline-block";
-			popupBtnNoMsg.innerHTML = "Dejame aqui otro ratito";
-			popupInput.style.display = "none";
-		} 
+	if (cual == "noPacman") {
+		popup.msg = "¡¿Es que quieres jugar sin prota?!<br />Vete a ver la tele!";
+		popup.noMsg = "Va, pongo uno.";
 	}
-fondoPopup.style.display = 'block';
-popup.style.display = 'block';
+	else if (cual == "noNombre") {
+		popup.msg = "Has hecho algo, por eso de nombrarlo... nombre?";
+		popup.siMsg = "Guardar";
+		popup.noMsg = "Cancelar";
+	} 
+	else if (cual == "borra") {
+		popup.msg = "¿Seguro que quieres limpiar el mapa?";
+	} 
+	else if (cual == "noComida") {
+		popup.msg = "Si no pones al menos una bolita...<br /> ¡el juego no acaba!";
+		popup.noMsg = "Venga va, pongo alguna";
+	}
+	else if (cual == "ok") {
+		popup.msg = "Guardado! Quieres probarlo? Dale a mapas de usuarios.";
+		popup.siMsg = "Mapas de usuarios";
+		popup.noMsg = "Dejame aqui otro ratito";
+	}
+	popup.si = cual == "noNombre" || cual == "borra" || cual == "ok";
+	popup.tipo = cual;
+	popup.carga();
+	popup.pon();
+}
+function popupClick(btn){
+	if (popup.tipo == 'noNombre'){
+		var cajatxtnombre = document.getElementById("nombre");
+		var cajatxtnombrepop = document.getElementById("popupInput");
+		if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
+			cajatxtnombre.value = cajatxtnombrepop.value;
+		}
+	}
+	if (btn == 'popupBtnYes'){
+		if (popup.tipo == 'borra'){
+			borraMapa();
+		}
+	} 
+	popup.quita();
 }
 
-function quitaPopup(cual){
-	var fondoPopup = document.getElementsByClassName("popup")[0];
-	var popup = document.getElementById(cual);
-	fondoPopup.style.display = 'none';
-	popup.style.display = 'none';
-	var cajatxtnombre = document.getElementById("nombre");
-	var cajatxtnombrepop = document.getElementById("popupInput");
-	if ((cajatxtnombrepop.style.display != "none")&&(cajatxtnombrepop.value != "")){
-		cajatxtnombre.value = cajatxtnombrepop.value;
-	}
-}
 creaMapa();
 
 

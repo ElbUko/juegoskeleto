@@ -55,7 +55,7 @@
                 	<img id="ojo" class="opcion" src="../img/ojo.png" onmouseover="ponMapaBonito()" onmouseout="quitaMapaBonito()" />
                 </div>
                 <div id="filaOpciones">
-                	<img id="papelera" class="opcion" src="../img/papelera.png" onclick="verificaBorra()" />
+                	<img id="papelera" class="opcion" src="../img/papelera.png" onclick="ponPopup('borra')" />
                 </div>
                 <div id="filaOpciones">
                     <p>Columnas</p>
@@ -86,9 +86,6 @@
             <input id="popupInput" type="text" maxlength="20" style="display: none;">
             <button id="popupBtnYes" class="popupBtn" onclick="popupClick(this.id)" style="display: none;">
                 <p id="popupBtnYesMsg"></p>
-            </button>
-            <button id="popupBtnGo" class="popupBtn" onclick="popupClick(this.id)" style="display: none;">
-                <p id="popupBtnGoMsg"></p>
             </button>
             <button id="popupBtnNo" class="popupBtn" onclick="popupClick(this.id)">
                 <p id="popupBtnNoMsg"></p>
