@@ -498,8 +498,8 @@ function enviaDatos(cadena){
 	var data = {
 		evt : 'pacAltaMapa',
 		nombre : vg.elemDom.nombre.value,
-		filas : vg.dim.filas,
-		columnas : vg.dim.columnas,
+		filas : vg.dim.filas+1,
+		columnas : vg.dim.cols+1,
 		mapadata : cadena,
 		imgdata : img
 	}
