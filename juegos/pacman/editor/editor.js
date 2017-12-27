@@ -11,7 +11,8 @@ var vg = {
 		maxCols: 	30,
 		maxFilas : 	19, 
 		minCols : 	5,
-		minFilas :	5
+		minFilas :	5,
+		tmnImg : 	10
 	},
 	tipoElem : {
 		menu : 		'elemMenu',
@@ -53,7 +54,28 @@ var vg = {
 		ponFila : 	document.getElementById('ponFila'),
 		quitaFila :	document.getElementById('quitaFila'),
 		casillas : 	document.getElementsByClassName('elemMapa')
-	}
+	},
+	mapingImgSimbolo : {
+		pacmanE1 : 	'p',
+		fantasma1 : 'a',
+		fantasma2 : 'c',
+		fantasma3 : 'l',
+		bola : 		'o',
+		bolon : 	'0',
+		par20V : 	'1',
+		par20H : 	'2',
+		esq20NE : 	'3',
+		esq20SE : 	'4',
+		esq20SO : 	'5',
+		esq20NO : 	'6',
+		esqCC : 	'7',
+		esqNC : 	'8',
+		esqEC : 	'9',
+		esqSC : 	'd',
+		esqOC : 	'z'
+	},
+	canvas : undefined,
+	ctx : undefined
 };
 
 document.addEventListener('mouseover',	rEntra);
@@ -304,14 +326,14 @@ function ponFila(){
 	fila.id = 'fila' + vg.dim.filas;
 	vg.elemDom.mapa.appendChild(fila);
 	fila.className = 'filaMapa';
-	mapa.appendChild(fila);
+	vg.elemDom.mapa.appendChild(fila);
 	for (let i=0; i<vg.dim.cols; i++){
 		ponCasilla(vg.dim.filas, i);
 	} 
 }
 function quitaFila(){
 	vg.dim.filas -= 1;
-	vg.elemDom.mapa.removeChild(mapa.lastChild);
+	vg.elemDom.mapa.removeChild(vg.elemDom.mapa.lastChild);
 }
 function ponCasilla(numFila, numCol){
 	var fila = document.getElementById('fila'+numFila);
@@ -408,10 +430,12 @@ function ponPopup(cual){
 		popup.noMsg = "Dejame aqui otro ratito";
 	}
 	popup.si = cual == "noNombre" || cual == "borra" || cual == "ok";
+	popup.input = true;
 	popup.tipo = cual;
 	popup.carga();
 	popup.pon();
 }
+
 function popupClick(btn){
 	if (popup.tipo == 'noNombre'){
 		var cajatxtnombrepop = document.getElementById("popupInput");
@@ -420,6 +444,7 @@ function popupClick(btn){
 		} else {
 			vg.elemDom.nombre.value = 'Sin nombre';
 		}
+		guardaMapa();
 	}
 	if (btn == 'popupBtnYes'){
 		if (popup.tipo == 'borra'){
@@ -433,57 +458,70 @@ function popupClick(btn){
 creaMapa();
 
 
-
-
+function inicializaCanvas(nFilas, nColumn){
+	vg.canvas = document.getElementById("canvas");
+	canvas.height = nFilas * vg.dim.tmnImg;
+	canvas.width = nColumn * vg.dim.tmnImg;
+	vg.ctx = canvas.getContext("2d");
+	vg.ctx.fillStyle = '#000';
+	vg.ctx.fillRect(0,0,canvas.width, canvas.height);
+}
+function pintaCasillaEnCanvas(x, y, img){
+	var tmn = vg.dim.tmnImg;
+	vg.ctx.drawImage(img, x*tmn, y*tmn, tmn, tmn);
+}
+function sacaElemCadena(src){
+	var idImg = src.substring(src.lastIndexOf('/')+1, src.length-4);
+	return vg.mapingImgSimbolo[idImg];
+}
 function guardaMapa(){
-
-
-	var nombre = cajatxtnombre.value;
-	var tmn = 10;
-	var canvas = document.getElementById("canvas");
-	canvas.height = nFilas*tmn;
-	canvas.width = nColumn*tmn;
-	var ctx = canvas.getContext("2d");
-	ctx.fillRect(0,0,canvas.width, canvas.height);
-	//Construyo la matriz para guardar la info en el js
-	var filas, divs, imgs = [], cadena = '', direcc, val, pos;
-	filas = mapa.childNodes;
-	imgs = menu.childNodes;
-	for (var i=0; i<filas.length; i++){
-		divs = filas[i].childNodes;
-		//cadena += '[';                      //cada fila es nuevo vector
-		for (var j=0; j<divs.length; j++){
-			if (divs[j].firstChild != null){
-				direcc = divs[j].firstChild.src;
-				nombreImg = direcc.slice(direcc.lastIndexOf('/')+1,direcc.length);
-				//[val, pos] = sacaImagen(nombreImg)     NO TIRA en CHROME
-				cosa = sacaImagen(nombreImg);
-				val = cosa[0];
-				pos = cosa[1];
-				cadena += val;
-				ctx.drawImage(imgs[Math.floor(pos/2)].childNodes[pos%2],j*tmn,i*tmn,tmn,tmn);
-			}
-			else {
+	var filas = vg.elemDom.mapa.childNodes;
+	inicializaCanvas(filas.length, filas[0].childNodes.length);
+	var cadena = '';
+	for (var i=0; i<filas.length; i++) {
+		var casillas = filas[i].childNodes;
+		for (var j=0; j<casillas.length; j++){
+			if (casillas[j].hasChildNodes()){
+				var img = casillas[j].firstChild;
+				pintaCasillaEnCanvas(j, i, img);
+				cadena += sacaElemCadena(img.src);
+			} else {
 				cadena += 'x';
 			}
 		}
-		//cadena += '],'                      //cerramos el vector
 	}
-	//lo mando con ajax
-	var img    = canvas.toDataURL("image/png");
-	ajax.open('POST', "../php/control/pacmanGuardaMapa.php", true);
-	ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	console.log("¿es edicion? "+esEdicion);
-	if (esEdicion){
-		var envia = "acc=edi&id="+id+"&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&nombreV="+nombreViejo+"&filas="+nFilas+"&columnas="+nColumn;	
+	enviaDatos(cadena);
+}
+
+function enviaDatos(cadena){
+	var img    = vg.canvas.toDataURL("image/png");
+	var data = {
+		evt : 'pacAltaMapa',
+		nombre : vg.elemDom.nombre.value,
+		filas : vg.dim.filas,
+		columnas : vg.dim.columnas,
+		mapadata : cadena,
+		imgdata : img
 	}
-	else {
-		var envia = "acc=cre&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&filas="+nFilas+"&columnas="+nColumn;
-	}
-	ajax.send(envia);
-	var boton = document.getElementById("guardar");
-	boton.disabled = true;
+
+	var url = "http://localhost/juegoskeleto/jskeletobk/puerta.php";
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', url, true);
+	xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	xhr.withCredentials = true;
+    xhr.send(JSON.stringify(data));
+	// console.log("¿es edicion? "+esEdicion);
+	// if (esEdicion){
+	// 	var envia = "acc=edi&id="+id+"&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&nombreV="+nombreViejo+"&filas="+nFilas+"&columnas="+nColumn;	
+	// }
+	// else {
+	// 	var envia = "acc=cre&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&filas="+nFilas+"&columnas="+nColumn;
+	// }
+	// ajax.send(envia);
+	// var boton = document.getElementById("guardar");
+	// boton.disabled = true;
 	//console.log(cadena);
+
 }
 
 
@@ -556,33 +594,7 @@ function guardaMapa(){
 //                     }
 
 
-                    
-
-
-//                     function sacaImagen(src){
-//                         var val;
-//                         switch(src){
-//                             case 'pacmanE1.png':    {val = 'p'; pos = 0;break;}
-//                             case 'fantasma1.png':   {val = 'a'; pos = 1;break;}
-//                             case 'fantasma2.png':   {val = 'c'; pos = 2;break;}
-//                             case 'fantasma3.png':   {val = 'l'; pos = 3;break;}
-//                             case 'bola.png':        {val = 'o'; pos = 4;break;}
-//                             case 'bolon.png':       {val = 'O'; pos = 5;break;}
-//                             case 'par20V.png':      {val = '1'; pos = 6;break;}
-//                             case 'par20H.png':      {val = '2'; pos = 7;break;}
-//                             case 'esq20NO.png':     {val = '6'; pos = 8;break;}
-//                             case 'esq20NE.png':     {val = '3'; pos = 9;break;}
-//                             case 'esq20SO.png':     {val = '5'; pos = 10;break;}
-//                             case 'esq20SE.png':     {val = '4'; pos = 11;break;}
-//                             case 'esqOC.png':       {val = 'z'; pos = 12;break;}
-//                             case 'esqNC.png':       {val = '8'; pos = 13;break;}
-//                             case 'esqEC.png':       {val = '9'; pos = 14;break;}
-//                             case 'esqSC.png':       {val = 'd'; pos = 15;break;}
-//                             case 'esqCC.png':       {val = '7'; pos = 16;break;}
-//                             default: val = '?';
-//                         }
-//                         return [val,pos];
-//                     }
+                   
 
 
 
