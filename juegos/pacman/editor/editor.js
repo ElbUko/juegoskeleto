@@ -407,13 +407,14 @@ var popup = {
 	}
 }
 
-function ponPopup(cual){
+function ponPopup(cual, msg){
 	if (cual == "noPacman") {
 		popup.msg = "¡¿Es que quieres jugar sin prota?!<br />Vete a ver la tele!";
 		popup.noMsg = "Va, pongo uno.";
 	}
 	else if (cual == "noNombre") {
 		popup.msg = "Has hecho algo, por eso de nombrarlo... nombre?";
+		popup.input = true;
 		popup.siMsg = "Guardar";
 		popup.noMsg = "Cancelar";
 	} 
@@ -424,13 +425,16 @@ function ponPopup(cual){
 		popup.msg = "Si no pones al menos una bolita...<br /> ¡el juego no acaba!";
 		popup.noMsg = "Venga va, pongo alguna";
 	}
-	else if (cual == "ok") {
+	else if (cual == 'guardada') {
 		popup.msg = "Guardado! Quieres probarlo? Dale a mapas de usuarios.";
 		popup.siMsg = "Mapas de usuarios";
 		popup.noMsg = "Dejame aqui otro ratito";
 	}
-	popup.si = cual == "noNombre" || cual == "borra" || cual == "ok";
-	popup.input = true;
+	else if (cual == 'error') {
+		popup.msg = msg;
+		popup.noMsg = "Anda que...";
+	}
+	popup.si = cual == "noNombre" || cual == "borra" || cual == "guardada";
 	popup.tipo = cual;
 	popup.carga();
 	popup.pon();
@@ -510,18 +514,23 @@ function enviaDatos(cadena){
 	xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhr.withCredentials = true;
     xhr.send(JSON.stringify(data));
-	// console.log("¿es edicion? "+esEdicion);
-	// if (esEdicion){
-	// 	var envia = "acc=edi&id="+id+"&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&nombreV="+nombreViejo+"&filas="+nFilas+"&columnas="+nColumn;	
-	// }
-	// else {
-	// 	var envia = "acc=cre&imgData="+img+"&mapadata="+cadena+"&nombre="+nombre+"&filas="+nFilas+"&columnas="+nColumn;
-	// }
-	// ajax.send(envia);
-	// var boton = document.getElementById("guardar");
-	// boton.disabled = true;
-	//console.log(cadena);
-
+    xhr.onreadystatechange = function(){
+    	if (this.readyState == 4){
+    		if (this.status == 200){
+				try {
+					var resp = JSON.parse(this.responseText);
+					if (resp.ok){
+						ponPopup('guardada');
+					} else {
+						ponPopup('error', resp.error);
+					}
+				}
+				catch(e){
+					console.log("Error en el ws: "+e);
+				}
+			}
+		}
+    };
 }
 
 
