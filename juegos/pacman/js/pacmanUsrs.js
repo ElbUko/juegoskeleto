@@ -24,13 +24,33 @@ function obtenPantallas(){
 var mapas;
 function cargaPantallas(pantallas){
 	mapas = pantallas
+	var mapas = document.getElementById('pantallas');
 	for (var i=0; i<pantallas.length; i++){
 		var pantalla = pantallas[i];
-		var divMapas = document.getElementById('pantallas');
 		var mapa = document.createElement('div');
+		mapa.className = 'mapaElem';
+		var nombre = document.createElement('p');
+		nombre.innerHTML = pantalla.nombre;
+		nombre.className = 'mapaNombre';
+		mapa.appendChild(nombre);
+		var usr = document.createElement('p');
+		usr.innerHTML = pantalla.usuario;
+		usr.className = 'mapaUsr';
+		mapa.appendChild(usr);
+		mapas.appendChild(mapa);
+			//mapa1
+				//nombre
+				//img
+				//usuario
+				//...
+
+
+/*
+		var pantalla = pantallas[i];
+		var divMapas = document.getElementById('pantallas');
 		mapa.id = 'p'+pantalla.nombre;
 		mapa.className = 'pantalla';
-		divMapas.appendChild(mapa);
+		divMapas.appendChild(mapa);*/
 	}
 }
 obtenPantallas();
