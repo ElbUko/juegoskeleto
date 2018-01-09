@@ -33,6 +33,10 @@ function cargaPantallas(pantallas){
 		nombre.innerHTML = pantalla.nombre;
 		nombre.className = 'mapaNombre';
 		mapa.appendChild(nombre);
+		var img = document.createElement('img');
+		img.src = pantalla.img;
+		img.className = 'mapaFoto';
+		mapa.appendChild(img);
 		var usr = document.createElement('p');
 		usr.innerHTML = pantalla.usuario;
 		usr.className = 'mapaUsr';

@@ -36,7 +36,7 @@ class Inicializa {
 		var barraPantallaPropocionH = 50;
 		var ladrilloPantallaProporcionW = 16;
 		var ladrilloPantallaProporcionH = 20;
-		var velocidadEnPropLadoMinimo = 60;
+		var velocidadEnPropLadoMinimo = 70;
  	
 		function inicializaPantalla(){
 			var anchoDefecto = window.innerWidth*0.7;
@@ -299,7 +299,7 @@ function actualizaLadrillos(){
 			(bola.x+bola.r>=ladrillos[i].x)&&(bola.x+bola.r<ladrillos[i].x+ladrillos[i].w)&&
 			(bola.y+bola.r/2>=ladrillos[i].y)&&(bola.y-bola.r/2<=ladrillos[i].y+ladrillos[i].h));
 
-		else if (tocaArriba || tocaAbajo){
+		if (tocaArriba || tocaAbajo){
 			choca(i,false,true);
 			break;
 		}
