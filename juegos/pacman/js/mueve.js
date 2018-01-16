@@ -222,4 +222,5 @@ function mueveHuyendo(i){
     else 
         //console.log(dirFantasma)
     return;
+    //tes
 }

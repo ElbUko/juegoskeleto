@@ -204,6 +204,7 @@ img {
 }
 .popupBtn{
 	border-radius: 2px;
+	display: inline-block;
 }
 #popupBtnYes{
 	background-color: #bdddbd;

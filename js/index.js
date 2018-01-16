@@ -1,6 +1,7 @@
 
 var Juegoskeleto = function() {
-	var jskeletobk = "http://juegoskeleto.netne.net/jskeletobk/puerta.php";
+	//var jskeletobk = "http://juegoskeleto.netne.net/puerta.php";
+	var jskeletobk = "http://localhost/juegoskeleto/jskeletobk/puerta.php";
 	var backAlive = false;
 	this.bk = (function(){return backAlive;})();
 	this.ajax = function(manejador){		
@@ -62,6 +63,7 @@ var Juegoskeleto = function() {
 				this.cajaLog.style.display = 'block';
 				this.formUsr.value = '';
 				this.formPsswd.value = '';
+				this.ponPopup();
 			}
 			if (this.data.popup)
 				this.ponPopup();
