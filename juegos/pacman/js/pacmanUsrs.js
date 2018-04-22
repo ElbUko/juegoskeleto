@@ -1,6 +1,7 @@
 
 function obtenPantallas(){
-	var url = "http://localhost/juegoskeleto/jskeletobk/puerta.php";
+	//TODO - unificar url
+	var url = "http://localhost/jskeletobk/puerta.php";
 	var xhr = new XMLHttpRequest();
 	xhr.open('POST', url, true);
 	xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");

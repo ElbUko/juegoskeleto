@@ -1,7 +1,7 @@
 
 var Juegoskeleto = function() {
 	//var jskeletobk = "http://juegoskeleto.netne.net/puerta.php";
-	var jskeletobk = "http://localhost/juegoskeleto/jskeletobk/puerta.php";
+	var jskeletobk = "http://localhost/jskeletobk/puerta.php";
 	var backAlive = false;
 	this.bk = (function(){return backAlive;})();
 	this.ajax = function(manejador){		
