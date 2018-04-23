@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<style type="text/css">
+		html, body{
+			display: inline-block;
+			display: inline-block;
+			height: 99.6%;
+			width: 100%;
+			margin: 0px;
+		}
+		section{
+			height: 100%;
+			float: right;
+		}
+		#selector{
+			width: 5%;
+			background-color: #faa;
+			float: left;
+		}
+		#btn{
+			margin-top: 333%;
+		}
+		#selector>button{
+			display: block;
+			width: 100%;
+			float: left;
+			border: 0px;
+		}
+		#selector>button>p{
+		}
+		.pantalla{
+			width: 95%;
+			display: none;
+		}
+		#juego{
+			background-color: #afa;
+		}
+		#editor{
+			background-color: #aaf;
+		}
+		#panta{
+		}
+		</style>
+	</head>
+	<body>
+		<section id="selector">
+			<button id="btn" onclick="pon('juego')">
+				<p>juego</p>
+			</button>
+			<button onclick="pon('editor')">
+				<p>editor</p>
+			</button>
+			<button onclick="pon('panta')">
+				<p>panta</p>
+			</button>
+		</section>
+		<section id="juego" class="pantalla">juego</section>
+		<section id="editor" class="pantalla">editor</section>
+		<section id="panta" class="pantalla">panta</section>
+		<script type="text/javascript">
+			function muestraDom(id) {
+				var el = document.getElementById(id);
+				el.style.display = "inline-block";
+			}
+			function ocultaDom(id) {
+				var el = document.getElementById(id);
+				el.style.display = "none";
+			}
+		</script>
+		<script type="text/javascript">
+			const JUEGO = 'juego';
+			const EDITOR = 'editor';
+			const PANTA = 'panta';
+			var mostrando;
+			document.body.onload = function(){
+				var params = document.location.search;
+				if (params.indexOf(EDITOR) != -1){
+					mostrando = EDITOR;
+				} else if (params.indexOf(PANTA) != -1){
+					mostrando = PANTA;
+				} else if (params.indexOf(JUEGO) != -1){
+					mostrando = JUEGO;
+				}
+				pon(mostrando);
+			}
+			function pon(pant) {
+				ocultaDom(mostrando);
+				mostrando = pant;
+				muestraDom(pant);
+			}
+		</script>
+	</body>
+</html>
