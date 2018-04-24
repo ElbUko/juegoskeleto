@@ -2,48 +2,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Insert title here</title>
-		<style type="text/css">
-		html, body{
-			display: inline-block;
-			display: inline-block;
-			height: 99.6%;
-			width: 100%;
-			margin: 0px;
-		}
-		section{
-			height: 100%;
-			float: right;
-		}
-		#selector{
-			width: 5%;
-			background-color: #faa;
-			float: left;
-		}
-		#btn{
-			margin-top: 333%;
-		}
-		#selector>button{
-			display: block;
-			width: 100%;
-			float: left;
-			border: 0px;
-		}
-		#selector>button>p{
-		}
-		.pantalla{
-			width: 95%;
-			display: none;
-		}
-		#juego{
-			background-color: #afa;
-		}
-		#editor{
-			background-color: #aaf;
-		}
-		#panta{
-		}
-		</style>
+		<title>Pacman</title>
+        <link rel="stylesheet" type="text/css" href="pacman.css">
 	</head>
 	<body>
 		<section id="selector">
@@ -57,9 +17,113 @@
 				<p>panta</p>
 			</button>
 		</section>
-		<section id="juego" class="pantalla">juego</section>
-		<section id="editor" class="pantalla">editor</section>
-		<section id="panta" class="pantalla">panta</section>
+		<section id="juego" class="pantalla">
+        	<script type="text/javascript" src="variables.js"></script>
+        	<script type='text/javascript' src='../js/mapas.js'></script>
+			<div id="pantallaJuego">
+		        <canvas id="canvas"></canvas>
+				<div id="puntuacion">
+					<p>Puntos:</p>
+					<p id="puntos">500</p>
+				</div>
+			</div>
+			<audio id="audioTestElem" autoplay onEnded="this.currentTime = 0.345;" preload="auto" >
+	      	 	<source src="../audio/PacmanBuko.ogg" type="audio/ogg; codecs=vorbis">
+	    	</audio>
+	        <script type="text/javascript" src="../js/controlDeTeclado.js"></script>
+	        <script type="text/javascript" src="../js/mueve.js"></script>
+	        <script type="text/javascript" src="../js/pinta.js"></script>
+	        <script type="text/javascript" src="../js/iaCutre.js"></script>
+	        <script type="text/javascript" src="../js/iaBuena.js"></script>
+	        <script type="text/javascript" src="../js/principal.js"></script>
+		</section>
+		<section id="editor" class="pantalla">
+			<div id="menu">
+            	<div class="filaMenu">
+            		<img id="pacman" class="elemMenuSel" src="../img/pacmanE1.png" />
+            		<img id="fantasma1" class="elemMenu" src="../img/fantasma1.png" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="fantasma2" class="elemMenu" src="../img/fantasma2.png" />
+                    <img id="fantasma3" class="elemMenu" src="../img/fantasma3.png" />
+                </div>
+            	<div class="filaMenu">
+            		<img id="bola" class="elemMenu" src="../img/bola.png" />
+                	<img id="bolon" class="elemMenu" src="../img/bolon.png" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="par20V" class="elemMenu" src="../img/par20V.png" />
+                    <img id="par20H" class="elemMenu" src="../img/par20H.png" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="par20NO" class="elemMenu" src="../img/esq20NO.png" />
+                    <img id="par20NE" class="elemMenu" src="../img/esq20NE.png" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="par20SO" class="elemMenu" src="../img/esq20SO.png" />
+                    <img id="par20SE" class="elemMenu" src="../img/esq20SE.png" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="esqOC" class="elemMenu" src="../img/esqOC.png" />
+                    <img id="esqNC" class="elemMenu" src="../img/esqNC.png" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="esqEC" class="elemMenu" src="../img/esqEC.png" />
+                    <img id="esqSC" class="elemMenu" src="../img/esqSC.png" />
+                </div>
+            	<div class="filaMenu">
+                    <img id="esqCC" class="elemMenu" src="../img/esqCC.png" />
+                    <img id="borra" class="elemMenu" src="../img/borrar.png" />
+                </div>
+            </div>
+            <div id="mapa"></div>        
+            <div id="opciones">
+                <div id="filaOpciones">
+                	<img id="ojo" class="opcion" src="../img/ojo.png" onmouseover="ponMapaBonito()" onmouseout="quitaMapaBonito()" />
+                </div>
+                <div id="filaOpciones">
+                	<img id="papelera" class="opcion" src="../img/papelera.png" onclick="ponPopup('borra')" />
+                </div>
+                <div id="filaOpciones">
+                    <p>Columnas</p>
+                    <img id="ponCol" class="opcion" src="../img/mas.png" onclick="controlaPonCol()" />
+                    <img id="quitaCol" class="opcion" src="../img/menos.png" onclick="controlaQuitaCol()" />
+                </div>
+                <div id="filaOpciones">
+                    <p>Filas</p>
+                    <img id="ponFila" class="opcion" src="../img/mas.png" onclick="controlaPonFila()" />
+                    <img id="quitaFila" class="opcion" src="../img/menos.png" onclick="controlaQuitaFila()" />
+                </div>
+                <div id="filaOpciones">
+                    <p>Nombre:</p>
+                    <input id="nombre" type="text" maxlength="20">
+                </div>
+                <div id="guardar" onclick="verificaGuarda()" ><p>Guardar</p></div>
+            </div>
+	        
+	        <!--Popups x-->
+	        <div class="popup" style="display: none;"></div>
+	        <div id="confirma" class="popupVentana" style="display: none;">
+	            <p id="popupMsg"></p>
+	            <input id="popupInput" type="text" maxlength="20" style="display: none;">
+	            <button id="popupBtnYes" class="popupBtn" onclick="popupClick(this.id)" style="display: none;">
+	                <p id="popupBtnYesMsg"></p>
+	            </button>
+	            <button id="popupBtnNo" class="popupBtn" onclick="popupClick(this.id)">
+	                <p id="popupBtnNoMsg"></p>
+	            </button>
+	        </div>
+	        <script type="text/javascript" src="../editor/editor.js"></script>
+		</section>
+		<section id="panta" class="pantalla">
+			<script src="../js/pacmanUsrs.js"></script>
+	    	<h3 id='mapasUsuarios'>Mapas de Usuarios</h3>
+	    	<p id='disclaimer3'>Estas son las pantallas hechas por otros usuarios. Si quieres hacer tus propias pantallas puedes hacerlo en el 
+	    		<a href="editor.html" id="mapasUsrBtnEditor">EDITOR de mapas!!</a>
+	    	</p>
+	    	<div id="pantallas">
+			</div>
+		</section>
 		<script type="text/javascript">
 			function muestraDom(id) {
 				var el = document.getElementById(id);
@@ -81,7 +145,7 @@
 					mostrando = EDITOR;
 				} else if (params.indexOf(PANTA) != -1){
 					mostrando = PANTA;
-				} else if (params.indexOf(JUEGO) != -1){
+				} else {
 					mostrando = JUEGO;
 				}
 				pon(mostrando);
@@ -90,6 +154,9 @@
 				ocultaDom(mostrando);
 				mostrando = pant;
 				muestraDom(pant);
+				if (pant == JUEGO){
+					arranca();
+				}
 			}
 		</script>
 	</body>
