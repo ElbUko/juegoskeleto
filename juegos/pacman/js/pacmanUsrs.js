@@ -22,40 +22,32 @@ function obtenPantallas(){
 		}
     };
 }
-var mapas;
+var mapasUsuarios = [];
 function cargaPantallas(pantallas){
-	mapas = pantallas
 	var mapas = document.getElementById('pantallas');
 	for (var i=0; i<pantallas.length; i++){
 		var pantalla = pantallas[i];
-		var mapa = document.createElement('div');
-		mapa.className = 'mapaElem';
 		var nombre = document.createElement('p');
+		var img = document.createElement('img');
+		var usr = document.createElement('p');
+		var mapa = document.createElement('div');
+		var id = mapasUsuarios.length
+		var cols = parseInt(pantalla.columnas-1);
 		nombre.innerHTML = pantalla.nombre;
 		nombre.className = 'mapaNombre';
-		mapa.appendChild(nombre);
-		var img = document.createElement('img');
+		img.onclick = function(){
+			juega(id, cols);
+		};
 		img.src = pantalla.img;
 		img.className = 'mapaFoto';
-		mapa.appendChild(img);
-		var usr = document.createElement('p');
 		usr.innerHTML = pantalla.usuario;
 		usr.className = 'mapaUsr';
+		mapa.className = 'mapaElem';
+		mapa.appendChild(nombre);
+		mapa.appendChild(img);
 		mapa.appendChild(usr);
 		mapas.appendChild(mapa);
-			//mapa1
-				//nombre
-				//img
-				//usuario
-				//...
-
-
-/*
-		var pantalla = pantallas[i];
-		var divMapas = document.getElementById('pantallas');
-		mapa.id = 'p'+pantalla.nombre;
-		mapa.className = 'pantalla';
-		divMapas.appendChild(mapa);*/
+		mapasUsuarios.push(pantalla.pantalla);
 	}
 }
 obtenPantallas();

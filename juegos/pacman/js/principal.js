@@ -66,7 +66,6 @@
                 return;
             }
             function arranca(){
-            	console.log(pantalla.length);
                 clearTimeout(timeoutId);
                 ctx.clearRect(0,0, canvas.width, canvas.height);
                 if (pantalla.length > 1){
