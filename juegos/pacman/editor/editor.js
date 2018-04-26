@@ -241,7 +241,7 @@ function verificaGuarda(){
 	}
 		//TODO comprobar si existe el nombre o la pantalla
 }
-
+//TODO - guarda una columna de mas!
 
 function noHayBolita(){
 	var filas = vg.elemDom.mapa.childNodes;
@@ -490,7 +490,7 @@ function guardaMapa(){
 				pintaCasillaEnCanvas(j, i, img);
 				cadena += sacaElemCadena(img.src);
 			} else {
-				cadena += 'x';
+				cadena += ' ';
 			}
 		}
 	}
@@ -532,92 +532,3 @@ function enviaDatos(cadena){
 		}
     };
 }
-
-
-
-
-//        var rutaImg = 'img/';
-//                     var cajatxtnombre = document.getElementById("nombre");
-//                     var pinchao = false,
-//                         entrao = false,
-//                         puesto = false;
-
-//                     //tamaños de los cuadros
-//                     var maxColumn = 30, minColumn = 5,
-//                         maxFilas = 19, minFilas = 5,
-//                         nColumn = 20,
-//                         nFilas = 15,
-//                         tMenu = 40,         //tamaño de la casilla de menu
-//                         tMapa = 30;     //tamaño de la casilla del mapa
-
-//                     //elementos que almacenar:
-//                     var elMenuSel=rutaImg+'par20V.png';
-
-//                     //localizacion de imagenes
-//                     var src = [rutaImg+'pacmanE1.png', rutaImg+'fantasma1.png', rutaImg+'fantasma2.png', rutaImg+'fantasma3.png', rutaImg+'bola.png', rutaImg+'bolon.png', rutaImg+'par20V.png',rutaImg+'par20H.png',rutaImg+'esq20NO.png',rutaImg+'esq20NE.png',rutaImg+'esq20SO.png',rutaImg+'esq20SE.png', rutaImg+'esqOC.png',rutaImg+'esqNC.png',rutaImg+'esqEC.png',rutaImg+'esqSC.png',rutaImg+'esqCC.png',rutaImg+'borrar.png'];
-
-
-        			
-//         			function cargaMapa(pantalla){
-//         				var filas = mapa.childNodes;
-//         				var x = 0;
-//         				for (var i=0; i<filas.length; i++){
-//         					var casillas = filas[i].childNodes;
-//         					for (var j=0; j<casillas.length; j++){
-//         						if (pantalla[x] != 'x'){
-//         							var img = document.createElement('img');
-//         							src = rutaImg;
-//         							switch (pantalla[x]){
-//                             			case 'p': {src += 'pacmanE1.png'; pacmanPuesto = true; break;}
-//         			                    case 'a': {src += 'fantasma1.png'; break;}
-//         			                    case 'c': {src += 'fantasma2.png'; break;}
-//         			                    case 'l': {src += 'fantasma3.png'; break;}
-//         			                    case 'o': {src += 'bola.png'; break;}
-//         			                    case 'O': {src += 'bolon.png'; break;}
-//         			                    case '1': {src += 'par20V.png'; break;}
-//         			                    case '2': {src += 'par20H.png'; break;}
-//         			                    case '6': {src += 'esq20NO.png'; break;}
-//         			                    case '3': {src += 'esq20NE.png'; break;}
-//         			                    case '5': {src += 'esq20SO.png'; break;}
-//         			                    case '4': {src += 'esq20SE.png'; break;}
-//         			                    case 'z': {src += 'esqOC.png'; break;}
-//         			                    case '8': {src += 'esqNC.png'; break;}
-//         			                    case '9': {src += 'esqEC.png'; break;}
-//         			                    case 'd': {src += 'esqSC.png'; break;}
-//         			                    default: {src += 'esqCC.png'; break;}
-//         							}
-//         							img.src = src;
-//         							img.width = tMapa;
-//         		                    img.className = 'elemMapaImg';
-//         		                    casillas[j].appendChild(img);								
-//         						}
-//         						x += 1;
-//         					}
-//         				}
-//         			}		
-
-//                     //objeto HTTP_REQUEST
-//                     http_request = false;
-//                     if(window.XMLHttpRequest){
-//                          var ajax = new XMLHttpRequest();
-//                     }
-
-
-                   
-
-
-
-//                     ajax.onreadystatechange=function(){
-//                     	if (ajax.readyState == 4){
-//                             if (ajax.status == 200){
-//                                 result = ajax.responseText;
-//         						//respuesta = JSON.parse(result);
-//         						ponPopup('guardado');
-//         						} else {
-//                                 alert('No se ha podido guardar');
-//                             }   
-//                         }             
-//                     };
-                    
-//         generaEditor();
-        
