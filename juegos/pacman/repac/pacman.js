@@ -6,41 +6,50 @@ var juego = function() {
 	var ctx,
 		relAspect,
 		mapa,
+		anchoTotalPx,
+		altoTotalPx,
+		anchoPx,
+		altoPx,
 		cols,
 		fils,
 		relAspecto,
 		c = {
 			relAspecto : 30
 		};
+	var pint;
 
 	var pintado = function(){
 		this.limpiaPantalla = function(){
-			this.ctx.clearRect(0,0, this.cols, this.filas);
+			ctx.clearRect(0,0, anchoTotalPx, altoTotalPx);
 		}		
 	};
 	
-	var p = new pintado();
-	
 	//CONSTRUCTOR
-	this.cargaMapa = function(mapa, relAspecto){
-		this.relAspecto = relAspecto 
-			? relAspecto 
+	this.cargaMapa = function(mapa, relAspect){
+		relAspecto = relAspect
+			? relAspect
 			: c.relAspecto;
 		if (mapa == undefined || 
 			mapa[0] == undefined || 
 			mapa[0][0] == undefined){
 			return undefined;
 		}
-		this.mapa = mapa;
-		this.filas = mapa.length;
-		this.cols = mapa[0].length;
-		this.relAspecto = relAspecto
+		mapa = mapa;
+		filas = mapa.length;
+		cols = mapa[0].length;
+		anchoPx = relAspecto; 
+		altoPx = relAspecto;
+		anchoTotalPx = cols * relAspecto; 
+		altoTotalPx = filas * relAspecto;
 		var canvas = document.getElementById("canvas");
-        this.ctx = canvas.getContext("2d");
+		ctx = canvas.getContext("2d");
+		pint = new pintado(ctx);
 	}
+	
 	
 	this.arranca = function(){
 		pint.limpiaPantalla();
+		
 	}
 }
 
