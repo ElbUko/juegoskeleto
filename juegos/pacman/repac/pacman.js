@@ -13,28 +13,49 @@ var juego = function() {
 		cols,
 		fils,
 		relAspecto,
+		pos = {
+			pacman : {
+				x : 0,
+				y : 0
+			},
+			fantasma : [],
+			comida : [],
+			pildora : []
+		},
 		c = {
 			relAspecto : 30
 		};
 	var pint;
 
+	  ////////////////////////////////////////////////////////////
+	 ////////				PINTADO						/////////
+	////////////////////////////////////////////////////////////
+	
 	var pintado = function(){
 		this.limpiaPantalla = function(){
-			ctx.clearRect(0,0, anchoTotalPx, altoTotalPx);
-		}		
+			ctx.fillStyle = "#000";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+		}
+		this.pinta = function(){
+            limpiaPantalla();
+		}
 	};
 	
 	//CONSTRUCTOR
-	this.cargaMapa = function(mapa, relAspect){
+	this.cargaMapa = function(mapaIn, relAspect){
+		function formateaMapa(mapIn){
+			
+		}
+		
 		relAspecto = relAspect
 			? relAspect
 			: c.relAspecto;
-		if (mapa == undefined || 
-			mapa[0] == undefined || 
-			mapa[0][0] == undefined){
-			return undefined;
+		if (mapaIn == undefined || 
+			mapaIn[0] == undefined || 
+			mapaIn[0][0] == undefined){
+			return false;
 		}
-		mapa = mapa;
+		mapa = formateaMapa(mapaIn);
 		filas = mapa.length;
 		cols = mapa[0].length;
 		anchoPx = relAspecto; 
@@ -44,6 +65,8 @@ var juego = function() {
 		var canvas = document.getElementById("canvas");
 		ctx = canvas.getContext("2d");
 		pint = new pintado(ctx);
+		return true;
+		
 	}
 	
 	
@@ -55,8 +78,9 @@ var juego = function() {
 
 function nuevoJuego(mapa){
 	var j = new juego();
-	j.cargaMapa(mapa);
-	j.arranca();
+	if (j.cargaMapa(mapa)){
+		j.arranca();		
+	}
 }
 
 nuevoJuego([[1,1,1,1,1,1],[11,1,1,1,1,1]]);
